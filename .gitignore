@@ -14,3 +14,4 @@ models/*.tmp.npz
 results/tmp/
 .DS_Store
 Thumbs.db
+docs/data/replays/

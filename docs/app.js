@@ -30,6 +30,18 @@ async function getJSON(url, opts) {
   return r.json();
 }
 
+// Static data: .json or gzipped .json.gz. Some hosts decompress transparently, so sniff the magic bytes.
+async function getData(path) {
+  const r = await fetch(`data/${path}`);
+  if (!r.ok) throw new Error(`${r.status} for ${path}`);
+  const buf = new Uint8Array(await r.arrayBuffer());
+  if (buf[0] === 0x1f && buf[1] === 0x8b) {
+    const stream = new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"));
+    return JSON.parse(await new Response(stream).text());
+  }
+  return JSON.parse(new TextDecoder().decode(buf));
+}
+
 function indexFrames(rec) {
   // per-frame id -> offset maps, built lazily
   rec._maps = new Array(rec.frames.length);
@@ -302,7 +314,7 @@ async function loadScenario(sid, baseline) {
   ["loadBase", "loadOurs"].forEach((id) => $(id).classList.remove("hidden"));
   try {
     const [geom, base, ours] = await Promise.all([
-      getJSON(`/api/network/${sid}`), getJSON(`/api/replay/${sid}/${baseline}`), getJSON(`/api/replay/${sid}/chowkpilot`)]);
+      getData(`network/${sid}.json.gz`), getData(`replays/${sid}__${baseline}.json.gz`), getData(`replays/${sid}__chowkpilot.json.gz`)]);
     setData(geom, base, ours);
   } catch (err) {
     $("loadBase").textContent = $("loadOurs").textContent = `Could not load replay (${err.message}).`;
@@ -347,7 +359,7 @@ const SHORT = { fixed: "Fixed-time", webster: "Webster", actuated: "Actuated", m
 
 async function loadBenchmark() {
   let b;
-  try { b = await getJSON("/api/benchmark"); } catch (_) {
+  try { b = await getData("benchmark.json"); } catch (_) {
     $("kpis").innerHTML = `<div class="kpi"><div class="v neutral">-</div><div class="k">Benchmark not available yet</div></div>`;
     return;
   }
@@ -395,6 +407,40 @@ async function loadBenchmark() {
 }
 
 /* ------------------------------------------------------------------ lab */
+function showResult(b, o, label) {
+  const ab = b.by_type.ambulance, ao = o.by_type.ambulance;
+  const card = (v, l, good) => `<div class="kpi"><div class="v ${good ? "" : "neutral"}">${v}</div><div class="k">${l}</div></div>`;
+  const sgn = (x) => `${x > 0 ? "+" : "−"}${Math.abs(x).toFixed(0)}%`;
+  const d = pct(o.mean_delay, b.mean_delay), c = pct(o.co2_kg, b.co2_kg);
+  $("labResult").innerHTML =
+    card(sgn(d), `mean delay vs ${label}: ${b.mean_delay.toFixed(0)} s → ${o.mean_delay.toFixed(0)} s`, d < 0) +
+    card(o.mean_stops.toFixed(2), `stops per vehicle (${label}: ${b.mean_stops.toFixed(2)})`, o.mean_stops < b.mean_stops) +
+    card(sgn(c), `CO₂: ${b.co2_kg.toFixed(0)} → ${o.co2_kg.toFixed(0)} kg`, c < 0) +
+    card(ab && ao ? `${ao.mean_delay.toFixed(0)} s` : "-", ab && ao ? `ambulance delay (${label}: ${ab.mean_delay.toFixed(0)} s)` : "no ambulance in this run",
+      ab && ao && ao.mean_delay < ab.mean_delay);
+}
+
+function playInTwin(geom, base, ours, baseline, suffix) {
+  state.baseline = baseline; $("baseName").textContent = CTRL_NAMES[baseline] + suffix;
+  setData(geom, base, ours);
+  state.t = 0; state.playing = true; $("btnPlay").textContent = "❚❚ Pause";
+  $("twin").scrollIntoView({ behavior: "smooth" });
+}
+
+async function loadCondition() {
+  const sid = $("labScenario").value, cond = $("labCond").value, st = $("labStatus");
+  st.textContent = "Loading recorded runs…";
+  try {
+    const [geom, base, ours] = await Promise.all([getData(`network/${sid}.json.gz`),
+      getData(`replays/${sid}__fixed__${cond}.json.gz`), getData(`replays/${sid}__chowkpilot__${cond}.json.gz`)]);
+    $("selScenario").value = sid;
+    const label = $("labCond").selectedOptions[0].textContent;
+    playInTwin(geom, base, ours, "fixed", ` · ${label}`);
+    showResult(base, ours, "fixed-time");
+    st.textContent = `Playing: ${label}.`;
+  } catch (err) { st.textContent = `Could not load this condition (${err.message}).`; }
+}
+
 async function runLab() {
   const btn = $("btnRun"), st = $("labStatus");
   const req = { scenario: $("labScenario").value, baseline: $("labBaseline").value, scale: Number($("labScale").value),
@@ -403,23 +449,12 @@ async function runLab() {
   btn.disabled = true; st.innerHTML = `<span style="display:inline-flex;gap:8px;align-items:center"><span class="spinner"></span> Simulating 10 minutes of traffic twice (seed ${req.seed})…</span>`;
   const t0 = performance.now();
   try {
-    const res = await getJSON("/api/simulate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req) });
-    const geom = await getJSON(`/api/network/${req.scenario}`);
-    state.baseline = req.baseline; $("baseName").textContent = CTRL_NAMES[req.baseline] + " · your run";
+    const res = await getJSON("api/simulate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req) });
+    const geom = await getData(`network/${req.scenario}.json.gz`);
     $("selScenario").value = req.scenario;
-    setData(geom, res.baseline, res.chowkpilot);
-    state.t = 0; state.playing = true; $("btnPlay").textContent = "❚❚ Pause";
-    const b = res.baseline, o = res.chowkpilot;
-    const ab = b.by_type.ambulance, ao = o.by_type.ambulance;
-    const card = (v, label, good) => `<div class="kpi"><div class="v ${good ? "" : "neutral"}">${v}</div><div class="k">${label}</div></div>`;
-    const d = pct(o.mean_delay, b.mean_delay), c = pct(o.co2_kg, b.co2_kg);
-    $("labResult").innerHTML =
-      card(`${d > 0 ? "+" : "−"}${Math.abs(d).toFixed(0)}%`, `mean delay: ${b.mean_delay.toFixed(0)} s → ${o.mean_delay.toFixed(0)} s`, d < 0) +
-      card(`${o.mean_stops.toFixed(2)}`, `stops per vehicle (baseline ${b.mean_stops.toFixed(2)})`, o.mean_stops < b.mean_stops) +
-      card(`${c > 0 ? "+" : "−"}${Math.abs(c).toFixed(0)}%`, `CO₂: ${b.co2_kg.toFixed(0)} → ${o.co2_kg.toFixed(0)} kg`, c < 0) +
-      card(ab && ao ? `${ao.mean_delay.toFixed(0)} s` : "-", ab && ao ? `ambulance delay (baseline ${ab.mean_delay.toFixed(0)} s)` : "no ambulance in this run", ab && ao && ao.mean_delay < ab.mean_delay);
+    playInTwin(geom, res.baseline, res.chowkpilot, req.baseline, " · your run");
+    showResult(res.baseline, res.chowkpilot, CTRL_NAMES[req.baseline].toLowerCase());
     st.textContent = `Done in ${((performance.now() - t0) / 1000).toFixed(0)} s. Now playing in the digital twin above.`;
-    $("twin").scrollIntoView({ behavior: "smooth" });
   } catch (err) {
     st.textContent = `Simulation failed: ${err.message}`;
   } finally { btn.disabled = false; }
@@ -440,12 +475,21 @@ async function init() {
   $("labAmb").oninput = (e) => ($("oAmb").textContent = e.target.value);
   $("labNoise").oninput = (e) => ($("oNoise").textContent = `${Math.round(Number(e.target.value) * 100)}%`);
   $("btnRun").onclick = runLab;
-  const list = await getJSON("/api/scenarios");
-  const opts = list.map((s) => `<option value="${s.id}">${s.title}${s.split === "test" ? " · unseen" : ""}</option>`).join("");
-  $("selScenario").innerHTML = opts; $("labScenario").innerHTML = opts;
+  const list = await getData("scenarios.json");
+  $("selScenario").innerHTML = list.filter((s) => s.replays.length).map((s) =>
+    `<option value="${s.id}">${s.title}${s.split === "test" ? " · unseen" : " · training layout"}</option>`).join("");
+  const withConds = list.filter((s) => Object.keys(s.conditions || {}).length);
+  $("labScenario").innerHTML = withConds.map((s) => `<option value="${s.id}">${s.title}</option>`).join("");
+  const fillConds = () => {
+    const s = withConds.find((x) => x.id === $("labScenario").value);
+    $("labCond").innerHTML = s ? Object.entries(s.conditions).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("") : "";
+  };
+  $("labScenario").onchange = fillConds; fillConds();
+  $("btnLoadCond").onclick = loadCondition;
   const reload = () => loadScenario($("selScenario").value, $("selBaseline").value);
   $("selScenario").onchange = reload; $("selBaseline").onchange = reload;
-  if (list.length) await loadScenario(list[0].id, "fixed");
+  if (list.length) await loadScenario($("selScenario").value, "fixed");
+  fetch("api/healthz").then((r) => (r.ok ? r.json() : null)).then((h) => { if (h && h.live) $("liveBox").classList.remove("hidden"); }).catch(() => {});
   requestAnimationFrame(tick);
   loadBenchmark();
 }

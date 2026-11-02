@@ -1,4 +1,4 @@
-# ChowkPilot control room (Hugging Face Spaces, Docker SDK)
+# ChowkPilot control room with the live-simulation backend (any Docker host, port 7860)
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 \
@@ -17,9 +17,9 @@ RUN pip install -r requirements.txt
 
 COPY --chown=user chowkpilot chowkpilot
 COPY --chown=user app app
+COPY --chown=user docs docs
 COPY --chown=user scenarios scenarios
 COPY --chown=user models/chowkpilot.npz models/chowkpilot.npz
-COPY --chown=user results results
 
 USER user
 EXPOSE 7860

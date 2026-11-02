@@ -17,7 +17,8 @@ from ..scenarios import registry
 from ..scenarios.vtypes import VEHICLE_TYPES
 from .runner import network, run_one
 
-REPLAY_DIR = os.path.join(registry.ROOT, "results", "replays")
+SITE_DATA = os.path.join(registry.ROOT, "docs", "data")  # published with GitHub Pages
+REPLAY_DIR = os.path.join(SITE_DATA, "replays")
 
 
 def _r(v: float) -> float:

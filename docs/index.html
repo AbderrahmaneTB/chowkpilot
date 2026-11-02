@@ -136,48 +136,56 @@
   <section id="lab" class="panel">
     <div class="section-head">
       <div>
-        <h2>Try it: run a new simulation</h2>
-        <p>Pick a junction and traffic conditions. The server runs two fresh SUMO simulations (your chosen baseline and ChowkPilot) on identical vehicles and streams them into the digital twin above.</p>
+        <h2>Stress-test it</h2>
+        <p>Load recorded runs of the unseen junctions under other conditions: off-peak, heavy demand, a sudden surge
+          (match or event ending) and noisy camera counts. Every run is a real SUMO simulation of the same vehicles
+          under both controllers.</p>
       </div>
     </div>
     <div class="lab">
       <div class="card form" id="labForm">
         <label>Junction <select id="labScenario"></select></label>
-        <label>Compare with
-          <select id="labBaseline">
-            <option value="fixed">Fixed-time (deployed plan)</option>
-            <option value="actuated">Vehicle-actuated</option>
-            <option value="maxpressure">Max-pressure</option>
-          </select>
-        </label>
-        <label><span class="row"><span>Demand (× peak)</span><output id="oScale">1.00</output></span>
-          <input type="range" id="labScale" min="0.5" max="1.4" step="0.05" value="1"></label>
-        <label>Time-of-day profile
-          <select id="labProfile">
-            <option value="peak">Peak hour</option>
-            <option value="surge">Sudden surge (event / match end)</option>
-            <option value="ramp">Building rush hour</option>
-            <option value="flat">Steady</option>
-          </select>
-        </label>
-        <label><span class="row"><span>Ambulances per hour</span><output id="oAmb">4</output></span>
-          <input type="range" id="labAmb" min="0" max="12" step="1" value="4"></label>
-        <label><span class="row"><span>Camera counting error</span><output id="oNoise">0%</output></span>
-          <input type="range" id="labNoise" min="0" max="0.3" step="0.05" value="0"></label>
-        <label class="check"><input type="checkbox" id="labEV" checked> Ambulance green corridor</label>
-        <button class="btn primary" id="btnRun">Run simulation</button>
+        <label>Condition <select id="labCond"></select></label>
+        <button class="btn primary" id="btnLoadCond">Load into the digital twin</button>
+        <div id="liveBox" class="hidden" style="display:grid;gap:12px;border-top:1px solid var(--line);padding-top:12px">
+          <div class="sub" style="color:var(--ours-text)">Live simulator detected: run a brand-new simulation</div>
+          <label>Compare with
+            <select id="labBaseline">
+              <option value="fixed">Fixed-time (deployed plan)</option>
+              <option value="actuated">Vehicle-actuated</option>
+              <option value="maxpressure">Max-pressure</option>
+            </select>
+          </label>
+          <label><span class="row"><span>Demand (× peak)</span><output id="oScale">1.00</output></span>
+            <input type="range" id="labScale" min="0.5" max="1.4" step="0.05" value="1"></label>
+          <label>Time-of-day profile
+            <select id="labProfile">
+              <option value="peak">Peak hour</option>
+              <option value="surge">Sudden surge (event / match end)</option>
+              <option value="ramp">Building rush hour</option>
+              <option value="flat">Steady</option>
+            </select>
+          </label>
+          <label><span class="row"><span>Ambulances per hour</span><output id="oAmb">4</output></span>
+            <input type="range" id="labAmb" min="0" max="12" step="1" value="4"></label>
+          <label><span class="row"><span>Camera counting error</span><output id="oNoise">0%</output></span>
+            <input type="range" id="labNoise" min="0" max="0.3" step="0.05" value="0"></label>
+          <label class="check"><input type="checkbox" id="labEV" checked> Ambulance green corridor</label>
+          <button class="btn" id="btnRun">Run new simulation</button>
+        </div>
         <div class="status" id="labStatus"></div>
       </div>
       <div class="card">
-        <h3>Result of your run</h3>
-        <div class="sub">Whole-run averages after all vehicles have left the network.</div>
+        <h3>Result of this run</h3>
+        <div class="sub">Whole-run averages after every vehicle has left the network (ChowkPilot vs fixed-time unless stated).</div>
         <div class="result-grid" id="labResult">
           <div class="kpi"><div class="v neutral">-</div><div class="k">Mean delay change</div></div>
           <div class="kpi"><div class="v neutral">-</div><div class="k">Stops per vehicle</div></div>
           <div class="kpi"><div class="v neutral">-</div><div class="k">CO₂ change</div></div>
           <div class="kpi"><div class="v neutral">-</div><div class="k">Ambulance delay</div></div>
         </div>
-        <div class="note">Runs take 10–60 s depending on the junction and server load. Results vary between seeds; the benchmark above averages many.</div>
+        <div class="note">A single run of one seed; the benchmark above averages many seeds with confidence intervals. To run brand-new
+          simulations, start the local server (<code>uvicorn app.server:app</code>, see the README).</div>
       </div>
     </div>
   </section>
