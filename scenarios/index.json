@@ -1,0 +1,1022 @@
+[
+  {
+    "id": "syn_single_1lane",
+    "title": "syn single 1lane",
+    "split": "train",
+    "kind": "synthetic",
+    "net": "synthetic/syn_single_1lane.net.xml",
+    "per_lane_rate": 405.4,
+    "major_bias": 1.0,
+    "description": "",
+    "bbox": null,
+    "webster_headway": 3.0,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          23.893663366336636,
+          0.0
+        ],
+        [
+          0.5,
+          20.047358490566037,
+          0.0
+        ],
+        [
+          0.7,
+          24.318744588744586,
+          0.0
+        ],
+        [
+          0.9,
+          31.45552188552189,
+          0.0
+        ],
+        [
+          1.1,
+          30.195853658536585,
+          0.0
+        ],
+        [
+          1.35,
+          40.56086560364465,
+          0.0
+        ],
+        [
+          1.6,
+          51.835281553398055,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          148.94097727272725
+        ],
+        [
+          2.2,
+          110.83006818181819
+        ],
+        [
+          2.6,
+          74.80554545454547
+        ],
+        [
+          3.0,
+          57.02052272727273
+        ]
+      ]
+    }
+  },
+  {
+    "id": "syn_single_2lane_opp",
+    "title": "syn single 2lane opp",
+    "split": "train",
+    "kind": "synthetic",
+    "net": "synthetic/syn_single_2lane_opp.net.xml",
+    "per_lane_rate": 480.0,
+    "major_bias": 1.0,
+    "description": "",
+    "bbox": null,
+    "webster_headway": 2.6,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          17.408157894736842,
+          0.0
+        ],
+        [
+          0.5,
+          18.47492113564669,
+          0.0
+        ],
+        [
+          0.7,
+          21.13140909090909,
+          0.0
+        ],
+        [
+          0.9,
+          21.355755919854282,
+          0.0
+        ],
+        [
+          1.1,
+          21.586934523809525,
+          0.0
+        ],
+        [
+          1.35,
+          26.004618885096697,
+          0.0
+        ],
+        [
+          1.6,
+          27.87075848303393,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          82.62395209580838
+        ],
+        [
+          2.2,
+          49.61983033932137
+        ],
+        [
+          2.6,
+          38.469850299401195
+        ],
+        [
+          3.0,
+          39.53183632734531
+        ]
+      ]
+    }
+  },
+  {
+    "id": "syn_single_3lane",
+    "title": "syn single 3lane",
+    "split": "train",
+    "kind": "synthetic",
+    "net": "synthetic/syn_single_3lane.net.xml",
+    "per_lane_rate": 379.2,
+    "major_bias": 1.0,
+    "description": "",
+    "bbox": null,
+    "webster_headway": 3.0,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          22.585555555555555,
+          0.0
+        ],
+        [
+          0.5,
+          24.16957356076759,
+          0.0
+        ],
+        [
+          0.7,
+          25.449984709480123,
+          0.0
+        ],
+        [
+          0.9,
+          29.148816837315128,
+          0.0
+        ],
+        [
+          1.1,
+          32.24188305252726,
+          0.0
+        ],
+        [
+          1.35,
+          41.62086389568052,
+          0.0
+        ],
+        [
+          1.6,
+          76.29646325459318,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          103.83026807473598
+        ],
+        [
+          2.2,
+          67.98757108042241
+        ],
+        [
+          2.6,
+          54.18359057676685
+        ],
+        [
+          3.0,
+          47.79844841592202
+        ]
+      ]
+    }
+  },
+  {
+    "id": "syn_single_2lane_inc",
+    "title": "syn single 2lane inc",
+    "split": "train",
+    "kind": "synthetic",
+    "net": "synthetic/syn_single_2lane_inc.net.xml",
+    "per_lane_rate": 480.0,
+    "major_bias": 1.0,
+    "description": "",
+    "bbox": null,
+    "webster_headway": 3.0,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          21.89078947368421,
+          0.0
+        ],
+        [
+          0.5,
+          22.777728706624604,
+          0.0
+        ],
+        [
+          0.7,
+          22.40059090909091,
+          0.0
+        ],
+        [
+          0.9,
+          24.415482695810564,
+          0.0
+        ],
+        [
+          1.1,
+          24.59232142857143,
+          0.0
+        ],
+        [
+          1.35,
+          31.20890784982935,
+          0.0
+        ],
+        [
+          1.6,
+          30.786566866267464,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          78.33815369261477
+        ],
+        [
+          2.2,
+          71.68002994011977
+        ],
+        [
+          2.6,
+          41.58347305389221
+        ],
+        [
+          3.0,
+          39.418153692614766
+        ]
+      ]
+    }
+  },
+  {
+    "id": "syn_arterial3",
+    "title": "syn arterial3",
+    "split": "train",
+    "kind": "synthetic",
+    "net": "synthetic/syn_arterial3.net.xml",
+    "per_lane_rate": 353.7,
+    "major_bias": 1.0,
+    "description": "",
+    "bbox": null,
+    "webster_headway": 2.2,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          37.98045333333334,
+          0.0
+        ],
+        [
+          0.5,
+          42.66068597560976,
+          0.0
+        ],
+        [
+          0.7,
+          42.21647651006711,
+          0.0
+        ],
+        [
+          0.9,
+          48.94369409660107,
+          0.0
+        ],
+        [
+          1.1,
+          56.46162689804772,
+          0.0
+        ],
+        [
+          1.35,
+          82.13100235849056,
+          0.0
+        ],
+        [
+          1.6,
+          117.49945685279188,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          149.20564153439153
+        ],
+        [
+          2.2,
+          132.7528835978836
+        ],
+        [
+          2.6,
+          138.2685978835979
+        ],
+        [
+          3.0,
+          140.13830687830688
+        ]
+      ]
+    }
+  },
+  {
+    "id": "syn_arterial4_inc",
+    "title": "syn arterial4 inc",
+    "split": "train",
+    "kind": "synthetic",
+    "net": "synthetic/syn_arterial4_inc.net.xml",
+    "per_lane_rate": 287.4,
+    "major_bias": 1.0,
+    "description": "",
+    "bbox": null,
+    "webster_headway": 2.6,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          64.67150214592274,
+          0.0
+        ],
+        [
+          0.5,
+          58.920706319702596,
+          0.0
+        ],
+        [
+          0.7,
+          72.3227141568981,
+          0.0
+        ],
+        [
+          0.9,
+          92.58360406091371,
+          0.0
+        ],
+        [
+          1.1,
+          152.51670745920745,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          228.97150296638102
+        ],
+        [
+          2.2,
+          176.49058668424522
+        ],
+        [
+          2.6,
+          169.3776400791035
+        ],
+        [
+          3.0,
+          175.3899472643375
+        ]
+      ]
+    }
+  },
+  {
+    "id": "syn_grid2x2",
+    "title": "syn grid2x2",
+    "split": "train",
+    "kind": "synthetic",
+    "net": "synthetic/syn_grid2x2.net.xml",
+    "per_lane_rate": 323.1,
+    "major_bias": 1.0,
+    "description": "",
+    "bbox": null,
+    "webster_headway": 1.8,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          17.506,
+          0.0
+        ],
+        [
+          0.5,
+          19.883475609756093,
+          0.0
+        ],
+        [
+          0.7,
+          21.04238255033557,
+          0.0
+        ],
+        [
+          0.9,
+          23.560787119856887,
+          0.0
+        ],
+        [
+          1.1,
+          30.55979754157628,
+          0.0
+        ],
+        [
+          1.35,
+          50.4967983490566,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          36.99507598784195
+        ],
+        [
+          2.2,
+          36.99507598784195
+        ],
+        [
+          2.6,
+          36.99507598784195
+        ],
+        [
+          3.0,
+          36.99507598784195
+        ]
+      ]
+    }
+  },
+  {
+    "id": "syn_grid3x3",
+    "title": "syn grid3x3",
+    "split": "train",
+    "kind": "synthetic",
+    "net": "synthetic/syn_grid3x3.net.xml",
+    "per_lane_rate": 247.0,
+    "major_bias": 1.0,
+    "description": "",
+    "bbox": null,
+    "webster_headway": 1.8,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          26.027611940298506,
+          0.0
+        ],
+        [
+          0.5,
+          27.86994555353902,
+          0.0
+        ],
+        [
+          0.7,
+          32.02042075736325,
+          0.0
+        ],
+        [
+          0.9,
+          51.860933333333335,
+          0.0
+        ],
+        [
+          1.1,
+          60.29690273037543,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          58.78579132473622
+        ],
+        [
+          2.2,
+          58.78579132473622
+        ],
+        [
+          2.6,
+          58.78579132473622
+        ],
+        [
+          3.0,
+          58.78579132473622
+        ]
+      ]
+    }
+  },
+  {
+    "id": "syn_spider5",
+    "title": "syn spider5",
+    "split": "train",
+    "kind": "synthetic",
+    "net": "synthetic/syn_spider5.net.xml",
+    "per_lane_rate": 480.0,
+    "major_bias": 1.0,
+    "description": "",
+    "bbox": null,
+    "webster_headway": 3.0,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          44.37578947368421,
+          0.0
+        ],
+        [
+          0.5,
+          44.56990825688073,
+          0.0
+        ],
+        [
+          0.7,
+          40.57303236797274,
+          0.0
+        ],
+        [
+          0.9,
+          43.36218832891247,
+          0.0
+        ],
+        [
+          1.1,
+          47.05111471861472,
+          0.0
+        ],
+        [
+          1.35,
+          49.40244951712029,
+          0.0
+        ],
+        [
+          1.6,
+          53.418001519756835,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          130.8672188449848
+        ],
+        [
+          2.2,
+          93.32391337386018
+        ],
+        [
+          2.6,
+          75.42529635258359
+        ],
+        [
+          3.0,
+          73.23145136778115
+        ]
+      ]
+    }
+  },
+  {
+    "id": "syn_random_a",
+    "title": "syn random a",
+    "split": "train",
+    "kind": "synthetic",
+    "net": "synthetic/syn_random_a.net.xml",
+    "per_lane_rate": 293.9,
+    "major_bias": 1.0,
+    "description": "",
+    "bbox": null,
+    "webster_headway": 1.8,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          21.571492537313436,
+          0.0
+        ],
+        [
+          0.5,
+          24.762795138888887,
+          0.0
+        ],
+        [
+          0.7,
+          29.36178571428571,
+          0.0
+        ],
+        [
+          0.9,
+          31.51462226640159,
+          0.0
+        ],
+        [
+          1.1,
+          44.451541565778854,
+          0.0
+        ],
+        [
+          1.35,
+          76.293818537859,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          39.38348708487084
+        ],
+        [
+          2.2,
+          39.38348708487084
+        ],
+        [
+          2.6,
+          39.38348708487084
+        ],
+        [
+          3.0,
+          39.38348708487084
+        ]
+      ]
+    }
+  },
+  {
+    "id": "syn_random_b",
+    "title": "syn random b",
+    "split": "train",
+    "kind": "synthetic",
+    "net": "synthetic/syn_random_b.net.xml",
+    "per_lane_rate": 388.0,
+    "major_bias": 1.0,
+    "description": "",
+    "bbox": null,
+    "webster_headway": 3.0,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          58.550940170940166,
+          0.0
+        ],
+        [
+          0.5,
+          62.528497409326434,
+          0.0
+        ],
+        [
+          0.7,
+          65.93791015625,
+          0.0
+        ],
+        [
+          0.9,
+          75.17815361890695,
+          0.0
+        ],
+        [
+          1.1,
+          80.85110576923077,
+          0.0
+        ],
+        [
+          1.35,
+          105.02806072477962,
+          0.0
+        ],
+        [
+          1.6,
+          134.002590108969,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          189.2513725490196
+        ],
+        [
+          2.2,
+          154.62383442265795
+        ],
+        [
+          2.6,
+          128.0626252723312
+        ],
+        [
+          3.0,
+          120.92187363834422
+        ]
+      ]
+    }
+  },
+  {
+    "id": "hyd_gachibowli",
+    "title": "Gachibowli / Financial District",
+    "split": "train",
+    "kind": "osm",
+    "net": "osm/hyd_gachibowli.net.xml",
+    "per_lane_rate": 164.2,
+    "major_bias": 1.5,
+    "description": "\u00a9 OpenStreetMap contributors (ODbL)",
+    "bbox": [
+      17.412,
+      78.334,
+      17.429,
+      78.36
+    ],
+    "webster_headway": 3.0,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          98.38563233376793,
+          0.0
+        ],
+        [
+          0.5,
+          145.89941569282138,
+          0.0
+        ],
+        [
+          0.7,
+          235.8936313193588,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          256.2868274302939
+        ],
+        [
+          2.2,
+          220.254574227581
+        ],
+        [
+          2.6,
+          182.1690730972118
+        ],
+        [
+          3.0,
+          181.54363225320273
+        ]
+      ]
+    }
+  },
+  {
+    "id": "hyd_abids",
+    "title": "Abids / Nampally",
+    "split": "train",
+    "kind": "osm",
+    "net": "osm/hyd_abids.net.xml",
+    "per_lane_rate": 121.4,
+    "major_bias": 1.5,
+    "description": "\u00a9 OpenStreetMap contributors (ODbL)",
+    "bbox": [
+      17.39,
+      78.47,
+      17.405,
+      78.49
+    ],
+    "webster_headway": 2.6,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          196.4928421900161,
+          0.0
+        ],
+        [
+          0.5,
+          459.52560716013545,
+          0.11611030478955008
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          328.49354249857385
+        ],
+        [
+          2.2,
+          278.7813918996007
+        ],
+        [
+          2.6,
+          212.52801483171706
+        ],
+        [
+          3.0,
+          292.2979463776383
+        ]
+      ]
+    }
+  },
+  {
+    "id": "hyd_secunderabad",
+    "title": "Secunderabad: S.D. Road, Patny & YMCA",
+    "split": "test",
+    "kind": "osm",
+    "net": "osm/hyd_secunderabad.net.xml",
+    "per_lane_rate": 153.2,
+    "major_bias": 1.5,
+    "description": "\u00a9 OpenStreetMap contributors (ODbL)",
+    "bbox": [
+      17.4355,
+      78.4925,
+      17.4465,
+      78.5085
+    ],
+    "webster_headway": 2.6,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          61.4472027972028,
+          0.0
+        ],
+        [
+          0.5,
+          96.24978675645342,
+          0.0
+        ],
+        [
+          0.7,
+          248.05173655063294,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          180.8236111111111
+        ],
+        [
+          2.2,
+          131.49438679245284
+        ],
+        [
+          2.6,
+          129.76120545073377
+        ],
+        [
+          3.0,
+          214.67237421383646
+        ]
+      ]
+    }
+  },
+  {
+    "id": "hyd_hitech",
+    "title": "Hitech City: Cyber Towers junction",
+    "split": "test",
+    "kind": "osm",
+    "net": "osm/hyd_hitech.net.xml",
+    "per_lane_rate": 162.4,
+    "major_bias": 1.5,
+    "description": "\u00a9 OpenStreetMap contributors (ODbL)",
+    "bbox": [
+      17.447,
+      78.376,
+      17.456,
+      78.387
+    ],
+    "webster_headway": 3.0,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          32.73561963190184,
+          0.0
+        ],
+        [
+          0.5,
+          41.258566009104705,
+          0.0
+        ],
+        [
+          0.7,
+          110.98646145610277,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          90.08064722617354
+        ],
+        [
+          2.2,
+          66.2024039829303
+        ],
+        [
+          2.6,
+          65.82290896159317
+        ],
+        [
+          3.0,
+          61.09620199146514
+        ]
+      ]
+    }
+  },
+  {
+    "id": "hyd_ameerpet",
+    "title": "Ameerpet / Begumpet",
+    "split": "test",
+    "kind": "osm",
+    "net": "osm/hyd_ameerpet.net.xml",
+    "per_lane_rate": 228.8,
+    "major_bias": 1.5,
+    "description": "\u00a9 OpenStreetMap contributors (ODbL)",
+    "bbox": [
+      17.433,
+      78.438,
+      17.445,
+      78.45
+    ],
+    "webster_headway": 3.0,
+    "calibration": {
+      "reference": "actuated",
+      "delay_by_scale": [
+        [
+          0.3,
+          48.616389610389604,
+          0.0
+        ],
+        [
+          0.5,
+          55.54765743073049,
+          0.0
+        ],
+        [
+          0.7,
+          71.77686540731996,
+          0.0
+        ],
+        [
+          0.9,
+          106.43100917431192,
+          0.0
+        ],
+        [
+          1.1,
+          179.02360899390243,
+          0.0
+        ]
+      ],
+      "webster_scores": [
+        [
+          1.8,
+          125.62698228128461
+        ],
+        [
+          2.2,
+          106.9902380952381
+        ],
+        [
+          2.6,
+          105.61883167220374
+        ],
+        [
+          3.0,
+          92.98878183831671
+        ]
+      ]
+    }
+  }
+]

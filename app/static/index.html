@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ChowkPilot · AI traffic signals for Indian junctions</title>
+  <meta name="description" content="A learned, junction-agnostic traffic signal controller, tested zero-shot on real Hyderabad junctions with Indian mixed traffic.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <div class="logo"><div class="logo-mark"><span></span></div>ChowkPilot</div>
+    <span class="pill">NeuralStorm 2026 · FT-01</span>
+    <nav class="nav">
+      <a href="#twin">Digital twin</a>
+      <a href="#bench">Benchmark</a>
+      <a href="#lab">Try it</a>
+      <a href="#how">How it works</a>
+      <a id="ghlink" href="https://github.com/AbderrahmaneTB/chowkpilot" target="_blank" rel="noopener">GitHub ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <span class="eyebrow">Smart traffic signal optimisation</span>
+      <h1>One AI signal brain<br>for every <em>chowk</em>.</h1>
+      <p class="lede">ChowkPilot decides, every few seconds, which approach of a junction gets green, using only
+        what a roadside camera can count. It was <b>trained on synthetic junctions</b> and runs <b>zero-shot on
+        real Hyderabad junctions it has never seen</b>, with Indian mixed traffic, lane-less two-wheelers,
+        left-hand driving and an ambulance green corridor.</p>
+    </div>
+    <div class="kpis" id="kpis">
+      <div class="kpi"><div class="v neutral">…</div><div class="k">Loading benchmark</div></div>
+      <div class="kpi"><div class="v neutral">…</div><div class="k">&nbsp;</div></div>
+      <div class="kpi"><div class="v neutral">…</div><div class="k">&nbsp;</div></div>
+      <div class="kpi"><div class="v neutral">…</div><div class="k">&nbsp;</div></div>
+    </div>
+  </section>
+
+  <section id="twin" class="panel">
+    <div class="section-head">
+      <div>
+        <h2>Digital twin: same vehicles, two signal brains</h2>
+        <p>Recorded SUMO simulations of the same peak-hour demand (same vehicles, same departure times).
+          Left: a baseline controller. Right: ChowkPilot. Scroll to zoom, drag to pan; both views stay in sync.</p>
+      </div>
+    </div>
+    <div class="controls">
+      <label>Junction
+        <select id="selScenario"></select>
+      </label>
+      <label>Compare with
+        <select id="selBaseline">
+          <option value="fixed">Fixed-time (deployed plan)</option>
+          <option value="actuated">Vehicle-actuated</option>
+          <option value="maxpressure">Max-pressure</option>
+          <option value="webster">Fixed-time (Webster-optimised)</option>
+        </select>
+      </label>
+      <button class="btn primary" id="btnPlay" aria-label="Play or pause">▶ Play</button>
+      <label>Speed
+        <select id="selSpeed">
+          <option value="2">2×</option>
+          <option value="5" selected>5×</option>
+          <option value="10">10×</option>
+          <option value="20">20×</option>
+        </select>
+      </label>
+      <div class="timebox">
+        <input type="range" id="timeSlider" min="0" max="900" step="1" value="0" aria-label="Simulation time">
+        <span class="clock" id="clock">00:00</span>
+      </div>
+    </div>
+    <div class="views">
+      <div class="view base">
+        <canvas id="cvBase"></canvas>
+        <div class="view-head"><span class="tag base">Baseline</span><b id="baseName">Fixed-time</b></div>
+        <div class="zoomhint">scroll = zoom · drag = pan</div>
+        <div class="hud" id="hudBase"></div>
+        <div class="loading" id="loadBase">Loading simulation…</div>
+      </div>
+      <div class="view ours">
+        <canvas id="cvOurs"></canvas>
+        <div class="view-head"><span class="tag ours">AI</span><b>ChowkPilot</b></div>
+        <div class="hud" id="hudOurs"></div>
+        <div class="loading" id="loadOurs">Loading simulation…</div>
+      </div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="below">
+      <div class="card">
+        <h3>Vehicles stopped at the junction approaches</h3>
+        <div class="sub">Every 10 s, over the recorded peak window. Lower is better.</div>
+        <canvas id="cvSeries"></canvas>
+      </div>
+      <div class="card">
+        <div class="explain-top">
+          <div>
+            <h3>Why this phase? (ChowkPilot)</h3>
+            <div class="sub">Learned score of each signal phase at the latest decision.</div>
+          </div>
+          <select id="selJunction" aria-label="Junction to explain"></select>
+        </div>
+        <div class="bars" id="bars"></div>
+        <div class="why" id="why"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="bench" class="panel">
+    <div class="section-head">
+      <div>
+        <h2>Benchmark on unseen real junctions</h2>
+        <p id="benchIntro">Mean delay per vehicle (lower is better). The real Hyderabad areas were never used for training or model selection.</p>
+      </div>
+    </div>
+    <div class="sm-grid" id="benchDelay"></div>
+    <div class="section-head" style="margin-top:22px"><div>
+      <h3 style="margin:0;font-size:17px">Robustness: delay reduction vs the deployed fixed-time plan</h3>
+      <p id="robustSub">Averaged over the three unseen junctions, 5 seeds each. Longer bar = bigger reduction.</p></div></div>
+    <div class="sm-grid" id="benchRobust" style="grid-template-columns:repeat(5,1fr)"></div>
+    <div class="card" style="margin-top:12px">
+      <h3>All metrics</h3>
+      <div class="sub">Averages over test seeds, at nominal peak demand. Green marks the best value in each row group.</div>
+      <div class="tablewrap"><table id="benchTable"></table></div>
+      <div class="note" id="benchNote"></div>
+    </div>
+  </section>
+
+  <section id="lab" class="panel">
+    <div class="section-head">
+      <div>
+        <h2>Try it: run a new simulation</h2>
+        <p>Pick a junction and traffic conditions. The server runs two fresh SUMO simulations (your chosen baseline and ChowkPilot) on identical vehicles and streams them into the digital twin above.</p>
+      </div>
+    </div>
+    <div class="lab">
+      <div class="card form" id="labForm">
+        <label>Junction <select id="labScenario"></select></label>
+        <label>Compare with
+          <select id="labBaseline">
+            <option value="fixed">Fixed-time (deployed plan)</option>
+            <option value="actuated">Vehicle-actuated</option>
+            <option value="maxpressure">Max-pressure</option>
+          </select>
+        </label>
+        <label><span class="row"><span>Demand (× peak)</span><output id="oScale">1.00</output></span>
+          <input type="range" id="labScale" min="0.5" max="1.4" step="0.05" value="1"></label>
+        <label>Time-of-day profile
+          <select id="labProfile">
+            <option value="peak">Peak hour</option>
+            <option value="surge">Sudden surge (event / match end)</option>
+            <option value="ramp">Building rush hour</option>
+            <option value="flat">Steady</option>
+          </select>
+        </label>
+        <label><span class="row"><span>Ambulances per hour</span><output id="oAmb">4</output></span>
+          <input type="range" id="labAmb" min="0" max="12" step="1" value="4"></label>
+        <label><span class="row"><span>Camera counting error</span><output id="oNoise">0%</output></span>
+          <input type="range" id="labNoise" min="0" max="0.3" step="0.05" value="0"></label>
+        <label class="check"><input type="checkbox" id="labEV" checked> Ambulance green corridor</label>
+        <button class="btn primary" id="btnRun">Run simulation</button>
+        <div class="status" id="labStatus"></div>
+      </div>
+      <div class="card">
+        <h3>Result of your run</h3>
+        <div class="sub">Whole-run averages after all vehicles have left the network.</div>
+        <div class="result-grid" id="labResult">
+          <div class="kpi"><div class="v neutral">-</div><div class="k">Mean delay change</div></div>
+          <div class="kpi"><div class="v neutral">-</div><div class="k">Stops per vehicle</div></div>
+          <div class="kpi"><div class="v neutral">-</div><div class="k">CO₂ change</div></div>
+          <div class="kpi"><div class="v neutral">-</div><div class="k">Ambulance delay</div></div>
+        </div>
+        <div class="note">Runs take 10–60 s depending on the junction and server load. Results vary between seeds; the benchmark above averages many.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="panel">
+    <div class="section-head"><div><h2>How it works</h2>
+      <p>A learned generalisation of max-pressure control, the classical rule with a proven throughput-optimality guarantee.</p></div></div>
+    <div class="how">
+      <div class="card">
+        <svg viewBox="0 0 720 330" role="img" aria-label="ChowkPilot architecture">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5c6a96"/></marker>
+          </defs>
+          <g font-family="Inter, sans-serif" font-size="13" fill="#e8edff">
+            <rect x="10" y="20" width="150" height="70" rx="12" fill="#131d36" stroke="#2a3962"/>
+            <text x="85" y="50" text-anchor="middle" font-weight="700">Camera zones</text>
+            <text x="85" y="70" text-anchor="middle" fill="#8d9ac4" font-size="11.5">last 150 m of each lane</text>
+            <rect x="10" y="130" width="150" height="70" rx="12" fill="#131d36" stroke="#2a3962"/>
+            <text x="85" y="160" text-anchor="middle" font-weight="700">Movements</text>
+            <text x="85" y="180" text-anchor="middle" fill="#8d9ac4" font-size="11.5">in-road → out-road</text>
+            <rect x="10" y="240" width="150" height="70" rx="12" fill="#131d36" stroke="#2a3962"/>
+            <text x="85" y="270" text-anchor="middle" font-weight="700">Phase mask</text>
+            <text x="85" y="290" text-anchor="middle" fill="#8d9ac4" font-size="11.5">which movements go</text>
+            <path d="M160 55 L230 140" stroke="#5c6a96" stroke-width="1.6" marker-end="url(#ar)" fill="none"/>
+            <path d="M160 165 L230 165" stroke="#5c6a96" stroke-width="1.6" marker-end="url(#ar)" fill="none"/>
+            <rect x="235" y="120" width="160" height="90" rx="12" fill="#0f2a1f" stroke="#22c55e"/>
+            <text x="315" y="152" text-anchor="middle" font-weight="700">φ  movement encoder</text>
+            <text x="315" y="172" text-anchor="middle" fill="#8d9ac4" font-size="11.5">queue, flow, wait,</text>
+            <text x="315" y="188" text-anchor="middle" fill="#8d9ac4" font-size="11.5">spillback, ambulance</text>
+            <path d="M395 165 L455 165" stroke="#5c6a96" stroke-width="1.6" marker-end="url(#ar)" fill="none"/>
+            <path d="M160 275 L470 205" stroke="#5c6a96" stroke-width="1.6" marker-end="url(#ar)" fill="none"/>
+            <rect x="460" y="120" width="120" height="90" rx="12" fill="#131d36" stroke="#2a3962"/>
+            <text x="520" y="152" text-anchor="middle" font-weight="700">pool per phase</text>
+            <text x="520" y="172" text-anchor="middle" fill="#8d9ac4" font-size="11.5">released vs</text>
+            <text x="520" y="188" text-anchor="middle" fill="#8d9ac4" font-size="11.5">waiting</text>
+            <path d="M580 165 L615 165" stroke="#5c6a96" stroke-width="1.6" marker-end="url(#ar)" fill="none"/>
+            <rect x="620" y="120" width="90" height="90" rx="12" fill="#0f2a1f" stroke="#22c55e"/>
+            <text x="665" y="160" text-anchor="middle" font-weight="700">ψ  score</text>
+            <text x="665" y="180" text-anchor="middle" fill="#8d9ac4" font-size="11.5">Q(phase)</text>
+            <path d="M665 210 L665 260 L420 260" stroke="#22c55e" stroke-width="1.6" marker-end="url(#ar)" fill="none"/>
+            <rect x="250" y="238" width="170" height="52" rx="12" fill="#131d36" stroke="#2a3962"/>
+            <text x="335" y="260" text-anchor="middle" font-weight="700">Safety layer</text>
+            <text x="335" y="278" text-anchor="middle" fill="#8d9ac4" font-size="11.5">min/max green · yellow · all-red</text>
+            <text x="250" y="42" fill="#8d9ac4" font-size="12">Same weights for every junction: 3-arm, 4-arm, 5-arm,</text>
+            <text x="250" y="60" fill="#8d9ac4" font-size="12">joined OSM clusters, any number of phases.</text>
+            <text x="250" y="86" fill="#5c6a96" font-size="11.5">~30k parameters · pure NumPy at inference</text>
+          </g>
+        </svg>
+      </div>
+      <div class="card steps">
+        <div class="step"><div class="num">1</div><div><h4>Sense like a camera</h4><p>Only counts a roadside camera can provide: vehicles and stopped vehicles in the last 150 m of each lane, and how full the exit roads are.</p></div></div>
+        <div class="step"><div class="num">2</div><div><h4>Score every phase</h4><p>Max-pressure scores a phase as Σ(in − out) over the movements it releases. ChowkPilot learns that scoring with deep reinforcement learning (Double DQN, semi-Markov rewards on true vehicle delay).</p></div></div>
+        <div class="step"><div class="num">3</div><div><h4>Stay safe and fair</h4><p>A fixed safety layer enforces minimum and maximum green, yellow and all-red clearance. An ambulance approaching within 150 m gets a green corridor.</p></div></div>
+        <div class="step"><div class="num">4</div><div><h4>Generalise</h4><p>Trained on 11 synthetic layouts and 2 real areas with randomised demand, time-of-day profiles and camera noise. Tested on 3 real Hyderabad areas it never saw.</p></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Simulation: Eclipse SUMO (EPL-2.0). Map data © OpenStreetMap contributors, available under the Open Database License (ODbL).</p>
+    <p>Demand is synthetic, calibrated to near-capacity peak conditions, not measured counts. ChowkPilot is a research prototype for decision support; real deployment needs local validation and traffic-police approval.</p>
+  </div>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>

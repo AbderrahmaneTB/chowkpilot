@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# training artefacts that change constantly
+models/chowkpilot_live.npz
+models/*.tmp.npz
+
+# local scratch
+*.log
+results/tmp/
+.DS_Store
+Thumbs.db
