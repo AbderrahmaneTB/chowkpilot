@@ -1,7 +1,7 @@
 [
   {
     "id": "syn_single_1lane",
-    "title": "syn single 1lane",
+    "title": "Synthetic 4-arm junction, 1 lane, approach-wise phases",
     "split": "train",
     "kind": "synthetic",
     "net": "synthetic/syn_single_1lane.net.xml",
@@ -71,7 +71,7 @@
   },
   {
     "id": "syn_single_2lane_opp",
-    "title": "syn single 2lane opp",
+    "title": "Synthetic 4-arm junction, 2 lanes + turn bay, opposing phases",
     "split": "train",
     "kind": "synthetic",
     "net": "synthetic/syn_single_2lane_opp.net.xml",
@@ -141,7 +141,7 @@
   },
   {
     "id": "syn_single_3lane",
-    "title": "syn single 3lane",
+    "title": "Synthetic 4-arm junction, 3 lanes, approach-wise phases",
     "split": "train",
     "kind": "synthetic",
     "net": "synthetic/syn_single_3lane.net.xml",
@@ -211,7 +211,7 @@
   },
   {
     "id": "syn_single_2lane_inc",
-    "title": "syn single 2lane inc",
+    "title": "Synthetic 4-arm junction, 2 lanes + turn bay, approach-wise phases",
     "split": "train",
     "kind": "synthetic",
     "net": "synthetic/syn_single_2lane_inc.net.xml",
@@ -281,7 +281,7 @@
   },
   {
     "id": "syn_arterial3",
-    "title": "syn arterial3",
+    "title": "Synthetic arterial, 3 signals",
     "split": "train",
     "kind": "synthetic",
     "net": "synthetic/syn_arterial3.net.xml",
@@ -351,7 +351,7 @@
   },
   {
     "id": "syn_arterial4_inc",
-    "title": "syn arterial4 inc",
+    "title": "Synthetic arterial, 4 signals, approach-wise phases",
     "split": "train",
     "kind": "synthetic",
     "net": "synthetic/syn_arterial4_inc.net.xml",
@@ -411,7 +411,7 @@
   },
   {
     "id": "syn_grid2x2",
-    "title": "syn grid2x2",
+    "title": "Synthetic 2\u00d72 grid",
     "split": "train",
     "kind": "synthetic",
     "net": "synthetic/syn_grid2x2.net.xml",
@@ -476,7 +476,7 @@
   },
   {
     "id": "syn_grid3x3",
-    "title": "syn grid3x3",
+    "title": "Synthetic 3\u00d73 grid",
     "split": "train",
     "kind": "synthetic",
     "net": "synthetic/syn_grid3x3.net.xml",
@@ -536,7 +536,7 @@
   },
   {
     "id": "syn_spider5",
-    "title": "syn spider5",
+    "title": "Synthetic 5-arm radial network",
     "split": "train",
     "kind": "synthetic",
     "net": "synthetic/syn_spider5.net.xml",
@@ -606,7 +606,7 @@
   },
   {
     "id": "syn_random_a",
-    "title": "syn random a",
+    "title": "Synthetic irregular network A",
     "split": "train",
     "kind": "synthetic",
     "net": "synthetic/syn_random_a.net.xml",
@@ -671,7 +671,7 @@
   },
   {
     "id": "syn_random_b",
-    "title": "syn random b",
+    "title": "Synthetic irregular network B",
     "split": "train",
     "kind": "synthetic",
     "net": "synthetic/syn_random_b.net.xml",

@@ -18,12 +18,13 @@ class LearningAgent:
     name, label, adaptive, program = "chowkpilot-train", "ChowkPilot (training)", True, None
 
     def __init__(self, policy: NumpyPolicy | None, eps: float, mp_share: float = 0.5,
-                 gamma: float = 0.985, reward_scale: float = 50.0, seed: int = 0):
+                 gamma: float = 0.985, reward_scale: float = 50.0, seed: int = 0, out_weight: float = 0.0):
         self.policy = policy
         self.eps = eps
         self.mp_share = mp_share
         self.gamma = gamma
         self.reward_scale = reward_scale
+        self.out_weight = out_weight
         self.rng = np.random.default_rng(seed)
         self.transitions: list = []
         self.episode_return = 0.0
@@ -36,7 +37,7 @@ class LearningAgent:
 
     def on_step(self, sim):
         for j in self.pending:
-            r = -sim.delay_rate(j) / self.reward_scale
+            r = -sim.delay_rate(j, self.out_weight) / self.reward_scale
             self.acc[j] += self.disc[j] * r
             self.disc[j] *= self.gamma
             self.episode_return += r

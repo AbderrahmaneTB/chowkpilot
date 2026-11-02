@@ -89,15 +89,24 @@ def test_safety_layer_invariants():
     with tempfile.TemporaryDirectory() as d:
         routes = os.path.join(d, "r.rou.xml")
         generate(s.net_path, routes, DemandSpec(horizon=900, seed=2, per_lane_rate=s.per_lane_rate))
-        states = []
+        states, worst_red = [], [0.0]
         from chowkpilot.env.sim import traci
 
         def on_step(sim):
-            states.append(traci.trafficlight.getRedYellowGreenState(nm.junctions[0].id))
+            jm = nm.junctions[0]
+            states.append(traci.trafficlight.getRedYellowGreenState(jm.id))
+            t = traci.simulation.getTime()
+            halt = [traci.lanearea.getLastStepHaltingNumber("e2_" + l) for l in jm.in_lanes]
+            for m in range(jm.num_movements):
+                if sum(halt[i] for i in jm.mv_in[m]) > 0:
+                    worst_red[0] = max(worst_red[0], t - sim.mv_last_green[0][m])
 
         sim = Simulation(nm, routes, RandomController(), cfg, seed=2, horizon=900, workdir=d)
         res = sim.run(on_step=on_step)
     assert res["trips"] > 100
+    # max red: a movement with stopped vehicles is released within max_red plus one decision cycle
+    bound = cfg.max_red + cfg.min_green + cfg.delta + cfg.yellow + cfg.all_red + 1
+    assert worst_red[0] <= bound, f"a movement waited {worst_red[0]:.0f}s for green (bound {bound}s)"
     # segment the signal history into constant-state runs
     runs, cur, n = [], states[0], 0
     for st in states:

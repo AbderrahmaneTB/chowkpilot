@@ -46,6 +46,7 @@ class SimConfig:
     all_red: int = 1
     min_green: int = 10
     max_green: int = 60
+    max_red: int = 120              # a movement with stopped vehicles must get green within this
     delta: int = 5
     detect_range: float = 150.0
     lateral_resolution: float | None = 0.8
@@ -112,6 +113,7 @@ class Simulation:
         self.timer = np.zeros(J, dtype=int)
         self.next_phase = np.zeros(J, dtype=int)
         self.last_served = [np.zeros(jm.num_phases) for jm in self.junctions]
+        self.mv_last_green = [np.zeros(jm.num_movements) for jm in self.junctions]
         self.decisions = 0
         self.frames: list = []
         self.vid_map: dict[str, int] = {}
@@ -147,7 +149,7 @@ class Simulation:
                 traci.trafficlight.setProgram(jm.id, program)
         self.lane_speed = {}
         for jm in self.junctions:
-            for l in jm.in_lanes:
+            for l in jm.in_lanes + jm.out_lanes:
                 self.lane_speed[l] = max(1.0, traci.lane.getMaxSpeed(l))
         if hasattr(self.controller, "reset"):
             self.controller.reset(self)
@@ -222,16 +224,47 @@ class Simulation:
                        for m in range(jm.num_movements)])
         return jm.mask.astype(float) @ mp
 
-    def delay_rate(self, j: int) -> float:
-        """Ground-truth delay accumulated per second on junction j's approaches (training reward)."""
+    def delay_rate(self, j: int, out_weight: float = 0.0) -> float:
+        """Ground-truth delay accumulated per second on junction j's approaches (training reward).
+
+        With out_weight > 0 the junction also pays for delay on its exit roads, so it cannot
+        push platoons into a jam downstream for free (the coupling max-pressure gets from '- out').
+        """
+        jm = self.junctions[j]
+        lanes = [(l, 1.0) for l in jm.in_lanes]
+        if out_weight > 0:
+            lanes += [(l, out_weight) for l in jm.out_lanes]
         total = 0.0
-        for l in self.junctions[j].in_lanes:
+        for l, w in lanes:
             n = traci.lane.getLastStepVehicleNumber(l)
             if n:
-                total += n * max(0.0, 1.0 - traci.lane.getLastStepMeanSpeed(l) / self.lane_speed[l])
+                total += w * n * max(0.0, 1.0 - traci.lane.getLastStepMeanSpeed(l) / self.lane_speed[l])
         return total
 
     # ------------------------------------------------------------------ control
+    def allowed_phases(self, j: int) -> np.ndarray:
+        """Safety constraints on the next phase, applied to every adaptive controller.
+
+        * max green: the current phase cannot be extended beyond max_green;
+        * max red: if a movement with stopped vehicles has waited longer than max_red,
+          only the phases that release the longest-waiting such movement are allowed.
+        """
+        jm, cfg = self.junctions[j], self.cfg
+        ok = np.ones(jm.num_phases, dtype=bool)
+        if self.timer[j] >= cfg.max_green:
+            ok[self.phase[j]] = False
+        t = traci.simulation.getTime()
+        waited = t - self.mv_last_green[j]
+        if waited.max() >= cfg.max_red:
+            halt = np.array([traci.lanearea.getLastStepHaltingNumber("e2_" + l) for l in jm.in_lanes])
+            starving = [m for m in np.argsort(-waited)
+                        if waited[m] >= cfg.max_red and halt[jm.mv_in[m]].sum() > 0]
+            if starving:
+                serve = jm.mask[:, starving[0]] & (np.arange(jm.num_phases) != self.phase[j])                     if not jm.mask[self.phase[j], starving[0]] else jm.mask[:, starving[0]]
+                if serve.any():
+                    ok = serve
+        return ok
+
     def ready_junctions(self) -> list[int]:
         cfg = self.cfg
         return [j for j in range(len(self.junctions))
@@ -289,6 +322,7 @@ class Simulation:
                 self._enter_green(j)
             if self.mode[j] == "G":
                 self.last_served[j][self.phase[j]] = t
+                self.mv_last_green[j][jm.mask[self.phase[j]]] = t
 
     def _enter_green(self, j: int):
         jm = self.junctions[j]
@@ -315,9 +349,11 @@ class Simulation:
             actions = self.controller.act(self, ready)
             for j in ready:
                 a = int(actions[j])
-                if a == self.phase[j] and self.timer[j] >= cfg.max_green:
-                    a = self.controller.fallback(self, j) if hasattr(self.controller, "fallback") \
-                        else int((self.phase[j] + 1) % self.junctions[j].num_phases)
+                ok = self.allowed_phases(j)  # enforced here, whatever the controller requested
+                if not ok[a]:
+                    p = self.pressure(j)
+                    p[~ok] = -np.inf
+                    a = int(np.argmax(p))
                 self._switch(j, a)
             self.decisions += len(ready)
         for j, a in forced.items():

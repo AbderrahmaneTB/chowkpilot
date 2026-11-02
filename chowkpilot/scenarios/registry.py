@@ -36,6 +36,20 @@ class Scenario:
         return os.path.join(SCENARIO_DIR, self.net)
 
 
+SYNTHETIC_TITLES = {
+    "syn_single_1lane": "Synthetic 4-arm junction, 1 lane, approach-wise phases",
+    "syn_single_2lane_opp": "Synthetic 4-arm junction, 2 lanes + turn bay, opposing phases",
+    "syn_single_3lane": "Synthetic 4-arm junction, 3 lanes, approach-wise phases",
+    "syn_single_2lane_inc": "Synthetic 4-arm junction, 2 lanes + turn bay, approach-wise phases",
+    "syn_arterial3": "Synthetic arterial, 3 signals",
+    "syn_arterial4_inc": "Synthetic arterial, 4 signals, approach-wise phases",
+    "syn_grid2x2": "Synthetic 2×2 grid",
+    "syn_grid3x3": "Synthetic 3×3 grid",
+    "syn_spider5": "Synthetic 5-arm radial network",
+    "syn_random_a": "Synthetic irregular network A",
+    "syn_random_b": "Synthetic irregular network B",
+}
+
 SYNTHETIC = [
     # id, generator kind, options, per-lane demand
     ("syn_single_1lane", "grid", dict(x=1, y=1, lanes=1, turn=0, layout="incoming"), 380),
@@ -95,7 +109,7 @@ def build_all(include_osm: bool = True, refresh_osm: bool = False) -> list[Scena
         path = os.path.join(SCENARIO_DIR, rel)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         netgenerate(path, kind, opts)
-        scenarios.append(Scenario(sid, sid.replace("_", " "), "train", "synthetic", rel, per_lane_rate=rate))
+        scenarios.append(Scenario(sid, SYNTHETIC_TITLES.get(sid, sid), "train", "synthetic", rel, per_lane_rate=rate))
     if include_osm:
         import time
         for sid, title, split, bbox, rate in OSM_AREAS:

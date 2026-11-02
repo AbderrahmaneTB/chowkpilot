@@ -27,12 +27,8 @@ class Actuated:
 
 
 def _allowed(sim, j):
-    """Phases a controller may pick: the current one is excluded once max green is reached."""
-    jm = sim.junctions[j]
-    ok = np.ones(jm.num_phases, dtype=bool)
-    if sim.timer[j] >= sim.cfg.max_green:
-        ok[sim.phase[j]] = False
-    return ok
+    """Phases a controller may pick (max-green and max-red safety constraints, see Simulation)."""
+    return sim.allowed_phases(j)
 
 
 class MaxPressure:

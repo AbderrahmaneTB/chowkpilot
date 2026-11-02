@@ -103,7 +103,7 @@ def sample_task(rng, ids, weights):
     return sid, demand, sim, int(rng.choice([1200, 1500, 1800]))
 
 
-def worker_main(wid, weights_path, out_q, stop_ev, eps_val, seed_base, validate_every):
+def worker_main(wid, weights_path, out_q, stop_ev, eps_val, seed_base, validate_every, out_weight=0.0):
     from chowkpilot.env.sim import SimConfig, Simulation
     from chowkpilot.eval.runner import demand_for, network, run_one
     from chowkpilot.rl.agent import LearningAgent
@@ -142,7 +142,7 @@ def worker_main(wid, weights_path, out_q, stop_ev, eps_val, seed_base, validate_
         try:
             routes = os.path.join(workdir, "r.rou.xml")
             generate(scen.net_path, routes, demand_for(scen, seed, horizon, **demand))
-            agent = LearningAgent(policy, eps=eps_val.value, seed=seed)
+            agent = LearningAgent(policy, eps=eps_val.value, seed=seed, out_weight=out_weight)
             sim = Simulation(network(scen), routes, agent, SimConfig(**simo), seed=seed,
                              horizon=horizon, workdir=workdir)
             t0 = time.time()
@@ -183,9 +183,17 @@ def main():
     ap.add_argument("--eps-decay-frac", type=float, default=0.45)
     ap.add_argument("--validate-every", type=int, default=12)
     ap.add_argument("--threads", type=int, default=2)
+    ap.add_argument("--out-weight", type=float, default=0.0,
+                    help="weight of exit-road delay in the reward (neighbourhood coupling)")
     ap.add_argument("--out", default="models")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--baselines-only", action="store_true", help="compute baseline validation scores and exit")
     args = ap.parse_args()
+    if args.baselines_only:
+        os.makedirs(args.out, exist_ok=True)
+        with open(os.path.join(args.out, "baseline_validation.json"), "w") as f:
+            json.dump(baseline_validation(), f, indent=1)
+        return
 
     import torch
     from chowkpilot.rl.policy import export_numpy, torch_model
@@ -210,15 +218,11 @@ def main():
         os.replace(tmp, path)
 
     cache = os.path.join(args.out, "baseline_validation.json")
+    base_val = None  # computed separately (python -m chowkpilot.rl.train --baselines-only) so training starts at once
     if os.path.exists(cache):
         with open(cache) as f:
             base_val = json.load(f)
-    else:
-        print("computing baseline validation scores...", flush=True)
-        base_val = baseline_validation()
-        with open(cache, "w") as f:
-            json.dump(base_val, f, indent=1)
-    print(json.dumps(base_val), flush=True)
+        print(json.dumps(base_val), flush=True)
 
     ctx = mp.get_context("spawn")
     out_q = ctx.Queue(maxsize=64)
@@ -226,7 +230,7 @@ def main():
     eps_val = ctx.Value("d", args.eps_start)
     save(weights_path, 0)
     procs = [ctx.Process(target=worker_main, args=(i, weights_path, out_q, stop_ev, eps_val, args.seed + 17,
-                                                  args.validate_every), daemon=True)
+                                                  args.validate_every, args.out_weight), daemon=True)
              for i in range(args.workers)]
     for p in procs:
         p.start()
@@ -309,6 +313,9 @@ def main():
         save(weights_path, updates)
         save(final_path, updates)
         torch.save(model.state_dict(), os.path.join(args.out, "chowkpilot.pt"))
+        if os.path.exists(cache):
+            with open(cache) as f:
+                log["baseline_validation"] = json.load(f)
         with open(os.path.join(args.out, "train_log.json"), "w") as f:
             json.dump(log, f, indent=1)
         for p in procs:

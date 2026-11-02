@@ -13,7 +13,7 @@ reinforcement learning:
 Because it only ever sees movements and a phase/movement mask, the same weights
 run on any junction layout (3-arm, 4-arm, joined OSM clusters, any number of phases).
 
-`NumpyPolicy` is the deployment form: about 30k parameters, pure NumPy, no PyTorch.
+`NumpyPolicy` is the deployment form: 38k parameters, pure NumPy, no PyTorch.
 """
 
 from __future__ import annotations
