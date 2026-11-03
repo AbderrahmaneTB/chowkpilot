@@ -221,3 +221,5 @@ select { max-width: 100%; text-overflow: ellipsis; }
 .runsum b { color: var(--text); font-family: var(--mono); }
 .runsum .good { color: var(--ours-text); font-weight: 700; font-family: var(--mono); }
 .runsum .bad { color: var(--text); font-weight: 700; font-family: var(--mono); }
+
+.bar .lbl .ev { color: var(--muted); font-family: var(--mono); font-size: 11px; margin-left: 6px; }

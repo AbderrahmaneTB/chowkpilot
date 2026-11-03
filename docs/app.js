@@ -268,16 +268,21 @@ function explain() {
   for (const x of rec.explain) { if (x.j !== j) continue; if (x.t > state.t) break; e = x; }
   if (!e) { bars.innerHTML = `<div class="sub">Waiting for the first decision at this junction…</div>`; why.textContent = ""; return; }
   const labels = (g.tls[j] && g.tls[j].phase_labels) || [];
+  const name = (p) => labels[p] || `Phase ${p + 1}`;
   const q = e.q, lo = Math.min(...q), hi = Math.max(...q), span = Math.max(1e-6, hi - lo);
+  const evid = (p) => (e.stop ? `${e.stop[p]} stopped · wait ${e.wait[p]} s · MP ${e.mp[p]}` : "");
   bars.innerHTML = q.map((v, p) => {
     const w = 8 + (92 * (v - lo)) / span;
-    const name = labels[p] || `Phase ${p + 1}`;
-    return `<div class="bar ${p === e.a ? "chosen" : ""}"><div class="track"><div class="fill" style="width:${w}%"></div>
-      <div class="lbl">${p === e.cur ? "● " : ""}${name}</div></div><div class="val">${v.toFixed(2)}</div></div>`;
+    return `<div class="bar ${p === e.a ? "chosen" : ""}" title="${name(p)}: score ${v.toFixed(2)}${e.stop ? " · " + evid(p) : ""}">
+      <div class="track"><div class="fill" style="width:${w}%"></div>
+      <div class="lbl">${p === e.cur ? "● " : ""}${name(p)}${e.stop ? ` <span class="ev">${evid(p)}</span>` : ""}</div></div>
+      <div class="val">${v.toFixed(2)}</div></div>`;
   }).join("");
   const keep = e.a === e.cur;
-  why.innerHTML = `At <b>${fmtTime(e.t)}</b>: ${keep ? "kept" : "switched to"} <b>${labels[e.a] || "phase " + (e.a + 1)}</b>` +
-    `${keep ? " (still the highest-value phase)" : " because its score beat the current phase"}. ● = phase that was green.`;
+  const detail = (p) => (e.stop ? ` (${e.stop[p]} stopped vehicles, mean wait up to ${e.wait[p]} s)` : "");
+  why.innerHTML = `At <b>${fmtTime(e.t)}</b>: ${keep ? "kept" : "switched to"} <b>${name(e.a)}</b>${detail(e.a)}` +
+    (keep ? ", still the highest-value phase." : `, over <b>${name(e.cur)}</b>${detail(e.cur)}.`) +
+    ` <span style="color:var(--faint)">● = phase that was green · MP = max-pressure score the network receives as a prior</span>`;
 }
 
 /* ------------------------------------------------------------------ main loop */

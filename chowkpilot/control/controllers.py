@@ -64,12 +64,20 @@ class ChowkPilot:
     def act(self, sim, ready):
         out = {}
         for j in ready:
-            q = self.scores(sim, j)
+            mv, ph = sim.observe(j)
+            mask = sim.junctions[j].mask
+            q = self.policy.q_values(mv, ph, mask)
             q_masked = np.where(_allowed(sim, j), q, -np.inf)
             out[j] = int(np.argmax(q_masked))
             if self.explain:
+                # human-readable evidence per phase: stopped vehicles it releases, their longest mean wait,
+                # and the max-pressure score it receives as a prior
+                stopped = mask.astype(float) @ (mv[:, 0] * 10.0)
+                wait = [float((mv[mask[p], 4] * 60.0).max()) if mask[p].any() else 0.0 for p in range(len(q))]
                 sim.explain.append({"t": int(sim_time(sim)), "j": j, "q": [round(float(x), 3) for x in q],
-                                    "a": out[j], "cur": int(sim.phase[j])})
+                                    "a": out[j], "cur": int(sim.phase[j]),
+                                    "stop": [int(round(x)) for x in stopped], "wait": [int(round(w)) for w in wait],
+                                    "mp": [round(float(x) * 20.0, 1) for x in ph[:, 4]]})
         return out
 
     def fallback(self, sim, j):
