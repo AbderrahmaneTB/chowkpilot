@@ -1,6 +1,6 @@
 # ChowkPilot handoff (Team Blackwater)
 
-Written 3 Nov 2026, 02:00 Algeria time, at the end of session 1. **Delete this file before the final submission.**
+Written 3 Nov 2026, 02:50 Algeria time, at the end of session 1. **Delete this file before the final submission.**
 
 - **Deadline:** Wed 4 Nov 2026, **8:00 PM IST** = 15:30 Algeria (UTC+1) = 14:30 UTC. Aim to submit by **12:00 Algeria**.
 - **Repo:** https://github.com/AbderrahmaneTB/chowkpilot (public, required by the rules)
@@ -45,22 +45,33 @@ Training history (validation = training layouts with held-out seeds; score = del
 
 | Run | Change | Outcome |
 |---|---|---|
-| 1 | mean pooling | arterial gridlock (max wait 1,732 s, 294 vehicles unfinished) |
-| 2 | + max-red safety rule, neighbourhood reward | still gridlocked: mean pooling kept favouring 2-movement turn phases |
+| 1 | mean pooling | arterial gridlock in validation (max wait 1,732 s, 294 vehicles unfinished) |
+| 2 | + max-red safety rule, neighbourhood reward | still gridlocked; a diagnostic re-run showed 244 vehicles stuck 20 min after demand ended (the figure the README cites). Cause: mean pooling favoured 2-movement turn phases |
 | 3 | **sum pooling + max-pressure score as an input** | fixed; best score about 0.93, then drifted after about 25 min |
 | 4 | checkpoints every 2,000 updates, cosine LR, ε floor 0.1, 400k buffer | 75 min, the current model (scores below) |
 
-Run 4 checkpoints validated so far:
+Run 4: every validated checkpoint (74.4 min of training, 15 validation rounds):
 
 | Checkpoint | Score | single@4242 | single@5252 | arterial@4243 | arterial@5253 | gachibowli@4244 |
 |---|---:|---:|---:|---:|---:|---:|
-| u002000 | **0.906** | 31.9 | 75.9 | 120.4 | 50.2 | 180.3 |
+| u002000 (selected, first pass) | **0.906** | 31.9 | 75.9 | 120.4 | 50.2 | 180.3 |
 | u006000 | 1.007 | 28.4 | 88.6 | 136.4 | 58.0 | 212.1 |
 | u008000 | 0.980 | 31.0 | 84.3 | 131.0 | 58.0 | 197.6 |
 | u012000 | 0.977 | 30.0 | 100.3 | 108.8 | 57.2 | 196.9 |
+| u016000 | 0.949 | 29.1 | 100.6 | 104.3 | 57.4 | 185.6 |
+| u018000 | 0.982 | 29.7 | 96.3 | 123.9 | 51.1 | 202.0 |
+| u022000 | 0.986 | 28.3 | 102.3 | 99.3 | 55.4 | 216.2 |
+| u024000 | 0.986 | 28.8 | 112.2 | 95.7 | 54.4 | 204.6 |
+| u028000 | 0.977 | 29.1 | 108.2 | 98.2 | 52.0 | 204.9 |
+| u030000 | 1.032 | 28.2 | 109.6 | 102.1 | 61.2 | 224.8 |
+| u036000 | 1.068 | 30.1 | 113.6 | 108.1 | 62.6 | 228.3 |
+| u038000 | 1.023 | 29.0 | 112.2 | 102.6 | 55.0 | 220.7 |
+| u040000 | 1.022 | 31.3 | 112.0 | 108.9 | 54.1 | 208.2 |
+| u042000 | 0.996 | 29.4 | 102.1 | 109.6 | 53.6 | 212.5 |
+| u044000 | 1.037 | 31.3 | 106.7 | 115.5 | 58.3 | 213.5 |
 | *actuated (reference)* | 1.000 | 31.1 | 73.7 | 120.0 | 76.4 | 209.1 |
-| *fixed-time* | | 48.1 | 88.4 | 224.3 | 88.8 | 426.1 |
-| *max-pressure* | ≈1.09 | 32.1 | 110.8 | 130.9 | 52.7 | 233.6 |
+| *fixed-time* | 1.641 | 48.1 | 88.4 | 224.3 | 88.8 | 426.1 |
+| *max-pressure* | 1.091 | 32.1 | 110.8 | 130.9 | 52.7 | 233.6 |
 
 What this tells us:
 - The best checkpoint beats fixed-time on every validation task (14–58% less delay) and beats max-pressure on average.
@@ -70,13 +81,15 @@ What this tells us:
   They consistently lose on the isolated 2-lane junction (96–102 s vs 74 s on seed 5252). That is a systematic weakness
   on isolated junctions, not noise; see P1 item 2.
 - One seed per task is noisy, so use `select --revalidate`.
+- **The run is best early and then drifts.** u002000 (11 min, ε still 0.7) scores 0.906. After about 30k updates
+  scores rise to 0.98–1.07, and single@5252 degrades steadily (76 → 113 s). Training longer as-is will not help.
 
 Full log: `models/train_log.json`. All checkpoints: `models/checkpoints/`.
 
 ## P0: finish a complete, honest submission first (≈ 3 h, safety net)
 
 **First check `results/finalize.log`.** Session 1 started `bash tools/finalize.sh` (all the steps below) on the
-first laptop at about 02:42 on 3 Nov.
+first laptop at about 02:52 on 3 Nov.
 - If the log ends with `finalize done`, every output exists: review them (numbers, GIF, video, README tables) and go
   to the "Then" list.
 - If it stopped part-way (laptop asleep or window closed), re-run the remaining steps, or the whole script:
@@ -129,14 +142,16 @@ The test junctions must stay clean: choose between models with `select --revalid
    - A finer decision interval: `SimConfig.delta` from 5 s to 2–3 s. Actuated control checks gaps every second;
      ChowkPilot can only extend a green in 5 s steps.
    - This needs a new training run. Update the tests in `tests/test_core.py`.
-3. **Longer training on Wael's machine (NVIDIA GPU).** SUMO runs on the CPU, so the number of CPU cores sets the speed;
-   the GPU frees those cores by running the learner:
+3. **A more stable training run on Wael's machine (NVIDIA GPU).** Run 4 drifts after its first ~16k updates, so the
+   aim is not just more minutes. Try a lower learning rate and slower target (`--lr 1e-4 --tau 0.002`),
+   `--ckpt-every 500` so the good early region gets more checkpoints, and the item-2 features. SUMO runs on the CPU,
+   so the number of CPU cores sets the speed; the GPU frees those cores by running the learner:
 
    ```bash
    python -m chowkpilot.rl.train --baselines-only --out models_w           # validation reference for this folder
-   python -m chowkpilot.rl.train --minutes 150 --workers <cores - 2> --threads 2 --device cuda \
-          --replay-ratio 0.5 --eps-end 0.05 --out-weight 0.5 --out models_w
-   python -m chowkpilot.rl.select --models models_w --revalidate 3 --workers <cores>
+   python -m chowkpilot.rl.train --minutes 90 --workers <cores - 2> --threads 2 --device cuda --lr 1e-4 --tau 0.002 \
+          --ckpt-every 500 --replay-ratio 0.5 --out-weight 0.5 --out models_w
+   python -m chowkpilot.rl.select --models models_w --revalidate 3 --ensemble --workers <cores>
    ```
 
    - Compare its re-validated score with run 4's.
