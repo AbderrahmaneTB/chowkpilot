@@ -11,7 +11,7 @@
 
 ChowkPilot is a reinforcement-learning traffic-signal controller built for Indian junctions. Every few
 seconds it decides which approach gets green, using only what a roadside camera can count. One small
-network (30k parameters) drives **any** junction layout: 3-arm, 4-arm, 5-arm, or a joined
+learned policy (three 30k-parameter networks whose scores are averaged) drives **any** junction layout: 3-arm, 4-arm, 5-arm, or a joined
 OpenStreetMap cluster with any number of phases. It was trained on synthetic junctions and two real
 Hyderabad areas, then evaluated **zero-shot on three real Hyderabad areas it never saw**, in a
 simulator configured for Indian traffic: lane-less two-wheelers, autos, buses, left-hand driving and
@@ -50,8 +50,9 @@ assertive merging.
 
 ```
  OpenStreetMap ──► SUMO digital twin ──► camera zones (last 150 m per lane)
- (real junction)    left-hand, sublane       │  vehicles, stopped vehicles, occupancy,
-                    mixed traffic            │  waiting time, exit-road spillback, ambulance flag
+ (real junction)    left-hand, sublane       │  vehicles, stopped vehicles, occupancy, waiting time,
+                    mixed traffic            │  arrivals in the last 50 m, gap since the last vehicle,
+                                             │  exit-road spillback, ambulance flag
                                              ▼
             per-movement features ──► φ (shared MLP) ──► sum-pool over the movements each phase
                                                           releases / keeps waiting
@@ -90,28 +91,42 @@ picks the highest. It comes with a proof of throughput optimality, but its score
 that structure, takes the max-pressure score as an input, and **learns a correction to it**
 (`chowkpilot/rl/policy.py`):
 
-- `e_m = φ(features of movement m)`: 8 camera-zone features (stopped and moving vehicles, occupancy, mean
-  waiting time, exit-road occupancy for spillback, ambulance flag, lane count, currently green).
+- `e_m = φ(features of movement m)`: 10 camera-zone features (stopped and moving vehicles, occupancy, mean
+  waiting time, exit-road occupancy for spillback, ambulance flag, lane count, currently green, moving vehicles in
+  the last 50 m, and seconds since a vehicle last crossed the stop line, the gap that actuated control reacts to).
 - For each phase *p*: **sum**-pool `e_m` over the movements it releases and over the movements it keeps waiting,
   append 5 phase features (is current, time in green, time since last served, share of movements, max-pressure
-  score), then `Q(p) = ψ(·)`. The network has 30,209 parameters and the same weights serve every junction.
+  score), then `Q(p) = ψ(·)`. Each network has 30,337 parameters, and the same weights serve every junction.
 - **Training** (`chowkpilot/rl/train.py`): Double DQN with a semi-Markov formulation. Each decision lasts until the
   junction's next decision point, and rewards are discounted per second. The reward is the ground-truth
   **delay rate** (Σ vehicles × (1 − v / v_max)) on the junction's approaches, plus half the delay on its exit
-  roads, so a junction pays for the jams it pushes downstream. Eight SUMO worker processes stream experience to one
-  learner. Every episode randomises the layout, demand level, time-of-day profile, OD imbalance, ambulance rate and
-  **camera noise**. Exploration mixes random phases with max-pressure actions. A numbered checkpoint is saved every
-  2,000 updates and validated on training layouts with held-out seeds; the deployed policy is the best checkpoint by
-  delay relative to actuated control (`chowkpilot/rl/select.py`, `models/selection.json`).
-- **Deployment form**: pure NumPy inference (`NumpyPolicy`), no PyTorch: about 0.15 ms per decision on a laptop CPU (measured).
+  roads, so a junction pays for the jams it pushes downstream. Ten SUMO worker processes stream experience to one
+  learner on an NVIDIA GPU. Every episode randomises the layout, demand level, time-of-day profile, OD imbalance,
+  ambulance rate and **camera noise**. Layouts are drawn with weight (junctions)^−0.5 (`--balance 0.5`), so isolated
+  junctions are not crowded out of the replay buffer by the 9-junction grids. Exploration mixes random phases with
+  max-pressure actions. A checkpoint is saved every 1,000 updates.
+- **Selection, on validation only** (`chowkpilot/rl/select.py`, `models/selection.json`):
+  1. Every early checkpoint is scored on training layouts with held-out seeds, by delay relative to actuated control.
+  2. The 3 best are re-run on 3 more seeds.
+  3. The deployed policy is their **ensemble**, which averages the three networks' phase scores (91,011 parameters
+     in total).
 
-**Two failures we found and fixed (both visible in the git history):**
+  Before release it was compared with our previous model (`models/run4/`) on 3 fresh seeds that nothing else had
+  used. It scored 0.853 against 0.898, where 1.0 means level with actuated control (`tools/head_to_head.py`,
+  `models/head_to_head.json`).
+- **Deployment form**: pure NumPy inference (`NumpyPolicy`), no PyTorch: about 0.16 ms per decision for the
+  three-network ensemble on a laptop CPU (measured).
+
+**Three failures we found and fixed (all visible in the git history):**
 1. *Mean pooling starves arterials.* Our first scorer averaged over a phase's released movements. On a 3-signal
    arterial it learned to hold protected right-turn phases (2 congested turn bays looked as valuable as 6 busy
    through movements), and traffic gridlocked: 244 vehicles were still stuck 20 minutes after demand ended. Max-pressure
    sums, so we switched to sum pooling and gave the network the max-pressure score as a prior.
 2. *Max-green is not enough for safety.* A policy can alternate between two phases forever and starve a third. We
    added a max-red guarantee (below) that holds for every controller.
+3. *Longer training made the policy worse.* Every run peaked within its first few thousand updates and then drifted.
+   In the deployed run, validation went from 0.89 to 1.02 within 10 minutes, and a lower learning rate only slowed
+   the drift. So we save dense early checkpoints and choose on validation instead of taking the last one.
 
 ### 4. Safety layer and ambulance green corridor
 Every adaptive controller, learned or not, acts through the same state machine in `chowkpilot/env/sim.py`, which
@@ -168,13 +183,15 @@ Reproduce the whole pipeline (each step writes into the repo; these are the exac
 python -c "from chowkpilot.scenarios.registry import build_all; build_all()"   # digital twins (OSM → SUMO)
 python -m chowkpilot.scenarios.calibrate                       # per-junction peak demand + Webster tuning
 python -m chowkpilot.rl.train --baselines-only                 # baseline scores for the validation tasks
-python -m chowkpilot.rl.train --minutes 75 --workers 8 --out-weight 0.5   # train (CPU only, laptop)
-python -m chowkpilot.rl.select                                 # pick the best checkpoint on validation
+python -m chowkpilot.rl.train --minutes 55 --workers 10 --device cuda --lr 1e-4 --tau 0.002 \n       --ckpt-every 1000 --balance 0.5 --out-weight 0.5         # train (stopped by hand at 10 min; CPU works too)
+python -m chowkpilot.rl.select --fill 1000 --fill-max 20000 --revalidate 3 --ensemble   # choose on validation
+python tools/head_to_head.py models/run4/chowkpilot.npz models/chowkpilot.npz          # fresh-seed check
 python -m chowkpilot.eval.benchmark --seeds 10                 # benchmark on the unseen junctions
 python -m chowkpilot.eval.make_replays                         # record the demo replays
 python -m chowkpilot.eval.export_site                          # data for the static site
 python -m chowkpilot.eval.figures && python -m chowkpilot.eval.readme_results   # figures + README tables
 python -m chowkpilot.eval.make_gif && python -m chowkpilot.eval.make_video      # demo GIF + video
+python tools/screenshots.py                                    # README screenshots (site served on :8090)
 ```
 
 Quick single run from Python:
@@ -220,9 +237,9 @@ tests/         unit tests
 | | |
 |---|---|
 | **Task** | Choose the next green phase of a signalised junction every 5 s (after the minimum green) |
-| **Inputs** | Per movement: stopped and moving vehicles, occupancy and mean waiting time in the last 150 m of each lane, exit-road occupancy, ambulance flag, lane count, currently green. Per phase: is current, time in green, time since last served, share of movements, max-pressure score |
+| **Inputs** | Per movement: stopped and moving vehicles, occupancy and mean waiting time in the last 150 m of each lane, moving vehicles in the last 50 m, seconds since a vehicle last crossed the stop line, exit-road occupancy, ambulance flag, lane count, currently green. Per phase: is current, time in green, time since last served, share of movements, max-pressure score |
 | **Output** | A score per candidate phase; the safety layer applies the highest-scoring *allowed* phase |
-| **Model** | Deep-sets phase scorer, 30k parameters, NumPy inference (about 0.15 ms per decision) |
+| **Model** | Ensemble of 3 deep-sets phase scorers (30,337 parameters each, 91,011 in total) whose scores are averaged; NumPy inference, about 0.16 ms per decision |
 | **Training data** | Simulated only: 11 synthetic layouts and 2 real Hyderabad areas (Gachibowli, Abids) in SUMO, randomised demand, time-of-day profiles, ambulances and camera noise |
 | **Evaluation** | 3 unseen real Hyderabad areas, 10 paired seeds, 4 baselines, robustness conditions (see Results) |
 | **Intended use** | Decision support and pilots for traffic engineers: shadow mode first, then supervised control at camera-equipped junctions |
@@ -238,6 +255,9 @@ tests/         unit tests
   match the street exactly. Signal phase plans are guessed by `netconvert`.
 - **Pedestrians are not modelled.** The minimum green (10 s) and all-red clearance are conservative placeholders
   for pedestrian phases, which a deployment would add.
+- **Isolated junctions are the weak spot.** On the isolated 2-lane validation junction, vehicle-actuated control still
+  beats ChowkPilot (delay ratio about 1.08–1.11 across our runs). Gap features, layout balancing and a 3 s decision
+  interval did not close the gap. ChowkPilot's gains come from multi-junction corridors and networks.
 - **Camera perception is assumed, not built.** We model camera counting errors (noise and missed vehicles) and
   test robustness to them, but do not ship a vision model.
 - **Fallback.** On sensor failure, a deployment should revert to the junction's fixed-time plan; the safety layer

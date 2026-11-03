@@ -190,10 +190,11 @@ def build(b, log):
         last = curve[-1] if curve else {}
         sel_path = os.path.join(registry.ROOT, "models", "selection.json")
         sel = json.load(open(sel_path, encoding="utf-8"))["selected"] if os.path.isfile(sel_path) else None
+        learner = "an NVIDIA GPU" if str(args.get("device", "cpu")).startswith("cuda") else "a laptop CPU"
         lines.append(f"Greedy validation of each checkpoint on training layouts with held-out seeds "
-                     f"({args.get('minutes', '?')} minutes of training on a laptop CPU, {args.get('workers', '?')} SUMO "
-                     f"workers, {last.get('env_steps', 0):,} decisions collected, {last.get('updates', 0):,} gradient "
-                     "updates)."
+                     f"({last.get('minutes', args.get('minutes', '?'))} minutes of training, {args.get('workers', '?')} "
+                     f"SUMO workers, learner on {learner}, {last.get('env_steps', 0):,} decisions collected, "
+                     f"{last.get('updates', 0):,} gradient updates)."
                      + ((f" The deployed policy is an ensemble of checkpoints {', '.join(f'`{m}`' for m in sel['members'])} "
                          "(it averages their phase scores)" if sel.get("members") else
                          f" The deployed policy is checkpoint `{sel['ckpt']}` ({sel['updates']:,} updates)")

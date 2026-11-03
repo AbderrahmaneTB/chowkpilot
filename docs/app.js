@@ -108,7 +108,7 @@ class View {
       }
       ctx.setLineDash([]);
     }
-    ctx.font = "500 11px Inter, sans-serif"; ctx.fillStyle = "rgba(141,154,196,0.75)"; ctx.textAlign = "center";
+    ctx.font = "500 12px Barlow, sans-serif"; ctx.fillStyle = "rgba(141,154,196,0.75)"; ctx.textAlign = "center";
     for (const n of g.names) {
       const [px, py] = this.toScreen(n.x, n.y);
       if (px < -50 || py < -20 || px > this.w + 50 || py > this.h + 20) continue;
@@ -240,7 +240,7 @@ function drawSeries() {
   for (const [rec] of recs) rec.series.t.forEach((tt, i) => { if (tt <= tmax) ymax = Math.max(ymax, rec.series.halting[i]); });
   ymax = Math.ceil(ymax / 10) * 10;
   const X = (t) => pad.l + (t / tmax) * (W - pad.l - pad.r), Y = (v) => H - pad.b - (v / ymax) * (H - pad.t - pad.b);
-  ctx.strokeStyle = "#1f2b4b"; ctx.fillStyle = "#5c6a96"; ctx.font = "11px JetBrains Mono, monospace"; ctx.lineWidth = 1;
+  ctx.strokeStyle = "#1f2b4b"; ctx.fillStyle = "#5c6a96"; ctx.font = "11px 'IBM Plex Mono', monospace"; ctx.lineWidth = 1;
   for (let i = 0; i <= 4; i++) { const v = (ymax * i) / 4, y = Y(v); ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke(); ctx.fillText(String(Math.round(v)), 4, y + 4); }
   for (let m = 0; m <= tmax / 60; m += 5) ctx.fillText(`${m}m`, X(m * 60) - 8, H - 6);
   for (const [rec, col] of recs) {
@@ -251,7 +251,7 @@ function drawSeries() {
   }
   ctx.strokeStyle = "rgba(232,237,255,.5)"; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(X(state.t), pad.t); ctx.lineTo(X(state.t), H - pad.b); ctx.stroke(); ctx.setLineDash([]);
   // legend: colored line-key beside text in a text token (text never wears the series color)
-  ctx.font = "600 11px Inter, sans-serif"; ctx.lineWidth = 2;
+  ctx.font = "600 12px Barlow, sans-serif"; ctx.lineWidth = 2;
   [[CTRL_NAMES[state.baseline] || "Baseline", SERIES.base], ["ChowkPilot", SERIES.ours]].forEach(([label, col], i) => {
     const y = pad.t + 10 + i * 15;
     ctx.strokeStyle = col; ctx.beginPath(); ctx.moveTo(pad.l + 8, y - 4); ctx.lineTo(pad.l + 22, y - 4); ctx.stroke();
