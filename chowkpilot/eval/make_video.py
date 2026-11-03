@@ -155,7 +155,7 @@ def main():
     fade(card([("ChowkPilot", 84, True, TEXT), ("One AI signal brain for every chowk.", 40, False, GREEN_TXT),
                ("A learned traffic-signal controller for India's lane-less mixed traffic,", 24, False, MUTED),
                ("tested zero-shot on real Hyderabad junctions it never saw.", 24, False, MUTED)],
-              sub="NeuralStorm 2026 · Track 1 Future Tech · FT-01 Smart Traffic Signal Optimisation · Team Blackwater"),
+              sub="NeuralStorm 2026 · FT-01 Smart Traffic Signal Optimisation · Team Blackwater: Abderrahmane Tayeb Boudjema, Ouail Imad Eddine Zitouni"),
          int(4 * FPS), writer)
     fade(stats_card("The problem", [
         ("123 h", "lost per driver per year to rush-hour congestion in Hyderabad", "TomTom Traffic Index 2026"),

@@ -28,6 +28,8 @@
       <a href="#bench">Benchmark</a>
       <a href="#lab">Try it</a>
       <a href="#how">How it works</a>
+      <a href="#deploy">Deploy</a>
+      <a href="img/chowkpilot_walkthrough.mp4" target="_blank" rel="noopener">Video</a>
       <a id="ghlink" href="https://github.com/AbderrahmaneTB/chowkpilot" target="_blank" rel="noopener">GitHub ↗</a>
     </nav>
   </div>
@@ -144,7 +146,7 @@
     <div class="section-head" style="margin-top:22px"><div>
       <h3 style="margin:0;font-size:17px">Robustness: delay reduction vs the standard fixed-time plan</h3>
       <p id="robustSub">Averaged over the three unseen junctions, 5 seeds each. Longer bar = bigger reduction.</p></div></div>
-    <div class="sm-grid" id="benchRobust" style="grid-template-columns:repeat(5,1fr)"></div>
+    <div class="sm-grid" id="benchRobust"></div>
     <div class="card" style="margin-top:12px">
       <h3>All metrics</h3>
       <div class="sub">Averages over test seeds, at nominal peak demand. Green marks the best value in each row group.</div>
@@ -265,10 +267,29 @@
       </div>
     </div>
   </section>
+
+  <section id="deploy" class="panel">
+    <div class="section-head">
+      <div><h2>From simulation to a Hyderabad junction</h2>
+      <p>What already fits a real deployment, and the staged pilot we propose. Nothing here is controlled without an operator.</p></div>
+    </div>
+    <div class="fits">
+      <div class="card"><h3>Runs on an edge box</h3><p>About 0.16 ms per decision on a laptop CPU. No GPU at inference.</p></div>
+      <div class="card"><h3>Camera counts are enough</h3><p>With 20% counting error and 10% of vehicles missed, delay still fell 54% vs fixed-time.</p></div>
+      <div class="card"><h3>Safety stays outside the network</h3><p>Min/max green, max red and clearance are enforced separately. If the cameras fail, the junction reverts to its fixed plan.</p></div>
+    </div>
+    <ol class="pilot">
+      <li class="card"><span class="num">1</span><h3>Calibrated twin</h3><p>One corridor from OpenStreetMap plus a site survey, with demand from real counts. Re-run this benchmark on it (2–4 weeks).</p></li>
+      <li class="card"><span class="num">2</span><h3>Shadow mode</h3><p>Reads live counts and logs what it would do next to what the signal did. Engineers review the explanations (about 4 weeks).</p></li>
+      <li class="card"><span class="num">3</span><h3>Supervised pilot</h3><p>3–5 junctions, for example the Secunderabad corridor modelled here. An operator can switch back to the fixed plan at any time.</p></li>
+      <li class="card"><span class="num">4</span><h3>Scale by corridor</h3><p>Add each new area's twin to training. Still to build: camera counting, pedestrian phases, the controller interface and approvals.</p></li>
+    </ol>
+  </section>
 </main>
 
 <footer>
   <div class="wrap">
+    <p><b>Team Blackwater</b> · Abderrahmane Tayeb Boudjema · Ouail Imad Eddine Zitouni · NeuralStorm 2026, problem FT-01 · <a href="https://github.com/AbderrahmaneTB/chowkpilot">source on GitHub</a></p>
     <p>Simulation: Eclipse SUMO (EPL-2.0). Map data © OpenStreetMap contributors, available under the Open Database License (ODbL).</p>
     <p>Demand is synthetic, calibrated to near-capacity peak conditions, not measured counts. ChowkPilot is a research prototype for decision support; real deployment needs local validation and traffic-police approval.</p>
   </div>

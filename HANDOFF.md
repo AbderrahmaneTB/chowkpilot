@@ -7,7 +7,7 @@ Written 3 Nov 2026, 02:50 Algeria time, at the end of session 1. **Delete this f
 - **Live demo:** https://abderrahmanetb.github.io/chowkpilot/ (GitHub Pages from `docs/`; its data is **not published yet**, see P0)
 - **Track:** Track 1 Future Tech, **FT-01 Smart Traffic Signal Optimisation**.
 - **Judging:** Technical 35%, Impact 25%, README 20%, Demo 20%.
-- **Team:** Abderrahmane (@AbderrahmaneTB, repo owner), Wael (@WaelYTz, invited as a collaborator; he must accept the invite before he can push).
+- **Team:** Abderrahmane Tayeb Boudjema (@AbderrahmaneTB, repo owner) and Ouail Imad Eddine Zitouni, known as Wael (@WaelYTz, collaborator with push access).
 
 ## Session 2 update (3 Nov, afternoon, AbderrahmaneTB's laptop)
 
@@ -30,8 +30,9 @@ Written 3 Nov 2026, 02:50 Algeria time, at the end of session 1. **Delete this f
 - **Results in one line:** −59% delay vs fixed-time (significant at all 3 junctions) and −21% vs max-pressure. Level
   with actuated control (−2%, not significant). The exact-demand Webster plan is best at 2 of 3 areas.
 - **Still to do (people):**
-  1. Full names in README line 6 and on Devpost.
-  2. Upload `docs/img/chowkpilot_demo.mp4` to YouTube and add the link to the README and Devpost.
+  1. Full names: done in the README, licence and site footer; use the same on Devpost.
+  2. Upload `docs/img/chowkpilot_walkthrough.mp4` (2.5 min, narrated, made by `tools/make_walkthrough.py`) to
+     YouTube and add the link to the README and Devpost. `chowkpilot_demo.mp4` (48 s, no sound) is a short teaser.
   3. Create the Devpost entry from the text below; submit only after both of you agree.
   4. Delete this file in the final commit.
 
