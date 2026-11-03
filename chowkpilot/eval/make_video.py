@@ -1,4 +1,4 @@
-"""Render the ~75 s demo video (MP4) for the submission.
+"""Render the ~50 s demo video (MP4) for the submission.
 
     python -m chowkpilot.eval.make_video
 
@@ -108,10 +108,10 @@ def results_card(b):
     d = ImageDraw.Draw(img)
     s = b["summary"]
     d.text((90, 60), "Results on 3 real Hyderabad areas never seen in training", font=_font(34, True), fill=TEXT)
-    d.text((90, 110), f"{b['seeds']} paired seeds per junction · peak demand · network fully drained",
-           font=_font(18), fill=MUTED)
-    tiles = [(s["delay_vs_fixed"], "mean delay vs standard fixed-time plan"),
-             (s["delay_vs_webster"], "vs Webster-optimised fixed-time"),
+    d.text((90, 110), f"{b['seeds']} paired seeds per junction · peak demand · network fully drained · "
+           "change in mean delay, averaged over the 3 areas", font=_font(18), fill=MUTED)
+    tiles = [(s["delay_vs_fixed"], "vs the standard fixed-time plan"),
+             (s["delay_vs_webster"], "vs a Webster plan re-timed with each run's exact demand"),
              (s["delay_vs_actuated"], "vs vehicle-actuated control"),
              (s["delay_vs_maxpressure"], "vs max-pressure control")]
     for i, (v, label) in enumerate(tiles):
@@ -125,14 +125,15 @@ def results_card(b):
     y = 360
     for sid in b["test_scenarios"]:
         cells = b["cells"][sid]
-        d.text((90, y), b["titles"][sid], font=_font(18, True), fill=TEXT)
+        for j, chunk in enumerate(_wrap(b["titles"][sid], 24)):  # the name keeps to its own column
+            d.text((90, y - 4 + j * 22), chunk, font=_font(17, True), fill=TEXT)
         vmax = max(cells[c]["mean_delay"]["mean"] for c in ctrls)
         for k, c in enumerate(ctrls):
             v = cells[c]["mean_delay"]["mean"]
-            bx, by = 520, y + k * 18 - 2
-            d.rectangle([bx, by, bx + int(560 * v / vmax), by + 12], fill=OURS if c == "chowkpilot" else (107, 122, 166))
-            d.text((bx + int(560 * v / vmax) + 8, by - 3), f"{v:.0f} s", font=_font(13), fill=TEXT if c == "chowkpilot" else MUTED)
-            d.text((350, by - 3), NAMES[c].replace(" (AI)", ""), font=_font(13), fill=TEXT if c == "chowkpilot" else MUTED)
+            bx, by = 560, y + k * 18 - 2
+            d.rectangle([bx, by, bx + int(540 * v / vmax), by + 12], fill=OURS if c == "chowkpilot" else (107, 122, 166))
+            d.text((bx + int(540 * v / vmax) + 8, by - 3), f"{v:.0f} s", font=_font(13), fill=TEXT if c == "chowkpilot" else MUTED)
+            d.text((360, by - 3), NAMES[c].replace(" (AI)", ""), font=_font(13), fill=TEXT if c == "chowkpilot" else MUTED)
         y += 18 * len(ctrls) + 22
     return img
 

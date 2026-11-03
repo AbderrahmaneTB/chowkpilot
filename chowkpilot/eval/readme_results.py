@@ -26,8 +26,8 @@ def num(v, dp, unit=""):
     return "–" if v is None or v != v else f"{v:.{dp}f}{unit}"
 
 
-def pval(p):
-    return "<0.001" if p < 0.001 else f"{p:.3f}"
+def pfmt(p):
+    return "p<0.001" if p < 0.001 else f"p={p:.3f}"
 
 
 def picture(name, alt):
@@ -49,35 +49,55 @@ def narrative(b):
         ours = cells["chowkpilot"]["mean_delay"]["mean"]
         best = min((c for c in ctrls if c != "chowkpilot"), key=lambda c: cells[c]["mean_delay"]["mean"])
         pf, pa = paired[sid]["fixed"], paired[sid]["actuated"]
-        txt = (f"- **{titles[sid]}:** {pct(pf['delay_change_pct'])} delay vs fixed-time (p={pval(pf['p_value'])}), "
-               f"{pct(pa['delay_change_pct'])} vs vehicle-actuated (p={pval(pa['p_value'])}).")
+        txt = (f"- **{titles[sid]}:** {pct(pf['delay_change_pct'])} delay vs fixed-time ({pfmt(pf['p_value'])}), "
+               f"{pct(pa['delay_change_pct'])} vs vehicle-actuated ({pfmt(pa['p_value'])}).")
         if ours <= cells[best]["mean_delay"]["mean"]:
             wins += 1
             txt += f" Lowest mean delay of the five controllers ({ours:.1f} s)."
         else:
             txt += f" {NAMES[best]} is best here ({cells[best]['mean_delay']['mean']:.1f} s vs ChowkPilot's {ours:.1f} s)."
         rows.append(txt)
-    return "\n".join([f"ChowkPilot has the lowest mean delay on **{wins} of {len(test)}** unseen junctions.", ""] + rows)
+    note = ("The Webster baseline is re-timed for every run from that run's exact demand, which a city cannot know in "
+            "advance, so it is an upper bound for a fixed-time plan. Vehicle-actuated control uses ideal loop detectors.")
+    return "\n".join([f"ChowkPilot has the lowest mean delay on **{wins} of {len(test)}** unseen junctions.", ""] + rows
+                     + ["", note])
 
 
 def build(b, log):
     s, test, ctrls = b["summary"], b["test_scenarios"], b["controllers"]
     titles = b["titles"]
     paired = b["paired"]
-    # the significance claim is only made when every per-junction difference is an improvement with p < 0.01
-    better = [paired[sid][c]["delay_change_pct"] < 0 and paired[sid][c]["p_value"] < 0.01
-              for sid in test for c in ("fixed", "actuated") if c in paired.get(sid, {})]
+    n = len(test)
     areas = {1: "one real Hyderabad area", 2: "two real Hyderabad areas", 3: "three real Hyderabad areas"}.get(
-        len(test), f"{len(test)} real Hyderabad areas")
-    side = [f"{label} is {rel(s[key], 'with fixed-time')}" for key, label in (("co2_vs_fixed", "CO₂"),
-            ("ambulance_vs_fixed", "ambulance delay")) if s.get(key) is not None and s[key] == s[key]]
-    hero = (f"> **Result:** on {areas} it never saw in training, ChowkPilot's mean delay per vehicle is "
-            f"{rel(s['delay_vs_fixed'], 'the standard fixed-time plan')}, {rel(s['delay_vs_webster'], 'a Webster-optimised plan')}, "
-            f"{rel(s['delay_vs_actuated'], 'vehicle-actuated control')} and {rel(s['delay_vs_maxpressure'], 'max-pressure')}. "
-            + (" and ".join(side) + " " if side else "")
-            + f"({b['seeds']} paired seeds per junction"
-            + ("; every per-junction difference vs fixed-time and vs actuated is an improvement significant at p < 0.01)."
-               if better and all(better) else ")."))
+        n, f"{n} real Hyderabad areas")
+
+    def sig(base):
+        """How many junction-level differences vs this baseline are significant (paired t-test, p < 0.05)."""
+        prs = [paired[sid][base] for sid in test if base in paired.get(sid, {})]
+        good = sum(1 for pr in prs if pr["delay_change_pct"] < 0 and pr["p_value"] < 0.05)
+        bad = sum(1 for pr in prs if pr["delay_change_pct"] > 0 and pr["p_value"] < 0.05)
+        if good == n:
+            return f"better at all {n} junctions, p < 0.05"
+        if not good and not bad:
+            return "no junction-level difference is significant"
+        return ", ".join(x for x in (f"significantly better at {good} of {n} junctions" if good else "",
+                                     f"significantly worse at {bad}" if bad else "") if x)
+
+    side = [f"{label} {rel(s[key], 'with fixed-time')}" for key, label in (("co2_vs_fixed", "CO₂ is"),
+            ("ambulance_vs_fixed", "ambulance delay is")) if s.get(key) is not None and s[key] == s[key]]
+    others = sorted({NAMES[best] for best in (min(ctrls, key=lambda c: b["cells"][sid][c]["mean_delay"]["mean"])
+                                               for sid in test) if best != "chowkpilot"})
+    wins = sum(1 for sid in test if min(ctrls, key=lambda c: b["cells"][sid][c]["mean_delay"]["mean"]) == "chowkpilot")
+    tail = (f" At the other {n - wins}, the lowest mean delay belongs to " + " and ".join(others) + "."
+            if others else "")
+    hero = (f"> **Result:** on {areas} it never saw in training, and averaged over them, ChowkPilot's mean delay per "
+            f"vehicle is {rel(s['delay_vs_fixed'], 'the standard fixed-time plan')} ({sig('fixed')}), "
+            f"{rel(s['delay_vs_maxpressure'], 'max-pressure')} ({sig('maxpressure')}), "
+            f"{rel(s['delay_vs_actuated'], 'vehicle-actuated control')} ({sig('actuated')}) and "
+            f"{rel(s['delay_vs_webster'], 'a Webster plan re-timed with each run’s exact demand')} ({sig('webster')}). "
+            + (" and ".join(side) + ". " if side else "")
+            + f"ChowkPilot has the lowest mean delay of the five controllers at {wins} of {n} areas.{tail} "
+            f"({b['seeds']} paired seeds per junction.)")
     lines = []
     lines.append(f"All numbers below are produced by `python -m chowkpilot.eval.benchmark --seeds {b['seeds']}` and stored per "
                  f"run in [`results/benchmark.json`](results/benchmark.json). Each junction is simulated for a "
@@ -113,7 +133,7 @@ def build(b, log):
         row = []
         for c in ctrls[:-1]:
             pr = paired[sid].get(c)
-            row.append(f"{pct(pr['delay_change_pct'])} (wins {pr['wins']}/{pr['n']}, p={pval(pr['p_value'])})" if pr else "-")
+            row.append(f"{pct(pr['delay_change_pct'])} (wins {pr['wins']}/{pr['n']}, {pfmt(pr['p_value'])})" if pr else "-")
         lines.append(f"| {titles[sid]} | " + " | ".join(row) + " |")
     lines.append("")
     lines.append("### Other metrics (mean over seeds)")

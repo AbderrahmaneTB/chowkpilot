@@ -14,7 +14,6 @@ models/*.tmp.npz
 results/tmp/
 .DS_Store
 Thumbs.db
-docs/data/replays/
 .claude/
 models/ensemble.npz
 models/*.pt

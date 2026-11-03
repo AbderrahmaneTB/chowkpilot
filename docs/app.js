@@ -384,7 +384,7 @@ async function loadBenchmark() {
   const k = (x, label, sub) => `<div class="kpi"><div class="v ${x > 0 ? "neutral" : ""}">${sg(x)}</div><div class="k">${label}</div><div class="s">${sub}</div></div>`;
   $("kpis").innerHTML =
     k(s.delay_vs_fixed, "average delay vs today's fixed-time signals", "unseen Hyderabad junctions, peak demand") +
-    k(s.delay_vs_actuated, "average delay vs vehicle-actuated control", "the strongest classical baseline") +
+    k(s.delay_vs_actuated, "average delay vs vehicle-actuated control", "SUMO gap-based control with ideal detectors") +
     k(s.co2_vs_fixed, "CO₂ from traffic in the network", "HBEFA4 emission model, vs fixed-time") +
     k(s.ambulance_vs_fixed, "ambulance delay with green corridor", "vs fixed-time, same ambulances");
   $("benchIntro").textContent = `Mean delay per vehicle, ${b.seeds} paired seeds per junction, ${b.horizon / 60}-minute peak with the network fully drained. ` +

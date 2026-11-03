@@ -107,9 +107,25 @@ def _by_layout(d):
     return {k: sum(v) / len(v) for k, v in out.items()}
 
 
-def learning_curve(log, theme, selected=None):
+def validation_points(log, spath):
+    """Checkpoints validated during training plus those scored afterwards by select --fill, on the same tasks."""
+    keys = set(log["baseline_validation"]["actuated"])
+    pts = {v["ckpt"]: v for v in log["validation"] if v.get("delay") and v.get("ckpt")}
+    if os.path.isfile(spath):
+        for c in json.load(open(spath, encoding="utf-8"))["candidates"]:
+            if c.get("updates") is not None and c.get("delay") and c["ckpt"] not in pts:
+                pts[c["ckpt"]] = c
+    out = []
+    for v in pts.values():
+        d = {k: x for k, x in v["delay"].items() if k in keys}
+        if set(d) == keys:
+            out.append({"ckpt": v["ckpt"], "updates": v["updates"], "delay": d})
+    return sorted(out, key=lambda v: v["updates"])
+
+
+def learning_curve(log, theme, selected=None, val=None):
     th = THEMES[theme]
-    val = [v for v in log["validation"] if v["delay"]]
+    val = val or [v for v in log["validation"] if v["delay"]]
     if not val:
         return None
     base = {name: _by_layout(vals) for name, vals in log["baseline_validation"].items()}
@@ -173,7 +189,7 @@ def main():
             if b.get("robustness"):
                 figs["robustness"] = robustness(b, theme)
         if log:
-            figs["learning_curve"] = learning_curve(log, theme, selected)
+            figs["learning_curve"] = learning_curve(log, theme, selected, validation_points(log, spath))
         for name, fig in figs.items():
             if fig is None:
                 continue

@@ -230,3 +230,8 @@ select { max-width: 100%; text-overflow: ellipsis; }
 .runsum .bad { color: var(--text); font-weight: 700; font-family: var(--mono); }
 
 .bar .lbl .ev { color: var(--muted); font-family: var(--mono); font-size: 11px; margin-left: 6px; }
+
+/* robustness cards sit five to a row: narrower name and value columns leave the bar a usable track */
+#benchRobust .hb { grid-template-columns: 74px minmax(0, 1fr) 42px; gap: 6px; }
+#benchRobust .hb .trk { min-width: 60px; }
+@media (max-width: 1080px) { #benchRobust .hb { grid-template-columns: 118px minmax(0, 1fr) 74px; } }

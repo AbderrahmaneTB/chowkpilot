@@ -9,6 +9,21 @@ Written 3 Nov 2026, 02:50 Algeria time, at the end of session 1. **Delete this f
 - **Judging:** Technical 35%, Impact 25%, README 20%, Demo 20%.
 - **Team:** Abderrahmane (@AbderrahmaneTB, repo owner), Wael (@WaelYTz, invited as a collaborator; he must accept the invite before he can push).
 
+## Session 2 update (3 Nov, afternoon, AbderrahmaneTB's laptop)
+
+- The overnight run of `finalize.sh` died at benchmark run 60/480 (the laptop was switched off). None of its outputs
+  were used.
+- **Deployed model: run 5b's 3-network ensemble** (Wael's GPU run, branch `run5-stable-gpu`, merged into main).
+  - Chosen by `tools/head_to_head.py` on 3 fresh validation seeds (9191, 10101, 11111) that nothing else used:
+    run 5b 0.853 vs run 4 0.898.
+  - The rule was fixed before running: lower wins, and a gap under 0.01 keeps run 4.
+  - The choice was committed (`a413671`) before any benchmark run; the test areas played no part.
+  - Run 4's model and records are in `models/run4/`. The result is in `models/head_to_head.json`.
+- README and site updated for the ensemble: 10 movement inputs, 91,011 parameters, run 5b's training and selection,
+  and isolated junctions as a stated limitation.
+- Site design: Barlow (signage) typography, a fixed architecture diagram, focus states. CI is green.
+- `SKIP_SELECT=1 bash tools/finalize.sh 10` started at 15:14 on the ensemble.
+
 ## Rules we must keep (from the team brief)
 
 - Commit with your own git identity (AbderrahmaneTB or WaelYTz). **No `Co-authored-by: Claude` trailers, no AI
