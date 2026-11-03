@@ -109,7 +109,7 @@ def sample_task(rng, ids, weights):
     return sid, demand, sim, int(rng.choice([1200, 1500, 1800]))
 
 
-def worker_main(wid, weights_path, out_q, stop_ev, eps_val, seed_base, validate_every, out_weight=0.0):
+def worker_main(wid, weights_path, out_q, stop_ev, eps_val, seed_base, validate_every, out_weight=0.0, balance=None):
     from chowkpilot.env.sim import SimConfig, Simulation
     from chowkpilot.eval.runner import demand_for, network, run_one
     from chowkpilot.rl.agent import LearningAgent
@@ -121,7 +121,10 @@ def worker_main(wid, weights_path, out_q, stop_ev, eps_val, seed_base, validate_
     train = [s for s in registry.load_all() if s.split == "train"]
     by_id = {s.id: s for s in train}
     ids = [s.id for s in train]
-    w = np.array([1.0 + 0.15 * len(network(s).junctions) for s in train])
+    J = np.array([len(network(s).junctions) for s in train], dtype=float)
+    # an episode yields one transition per junction and decision, so without balancing the 9-junction grids
+    # fill the replay and isolated junctions get ~5% of it; junctions**-0.5 gives each layout a sqrt(J) share
+    w = J ** -balance if balance is not None else 1.0 + 0.15 * J
     w /= w.sum()
     policy, mtime, episodes = None, None, 0
     while not stop_ev.is_set():
@@ -198,6 +201,8 @@ def main():
     ap.add_argument("--device", default="cpu", help="learner device, e.g. cuda (SUMO workers always run on CPU)")
     ap.add_argument("--out-weight", type=float, default=0.0,
                     help="weight of exit-road delay in the reward (neighbourhood coupling)")
+    ap.add_argument("--balance", type=float, default=None,
+                    help="draw training layouts with weight junctions**-BALANCE (default: 1 + 0.15 * junctions)")
     ap.add_argument("--out", default="models")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--baselines-only", action="store_true", help="compute baseline validation scores and exit")
@@ -251,7 +256,7 @@ def main():
     eps_val = ctx.Value("d", args.eps_start)
     save(weights_path, 0)
     procs = [ctx.Process(target=worker_main, args=(i, weights_path, out_q, stop_ev, eps_val, args.seed + 17,
-                                                  args.validate_every, args.out_weight), daemon=True)
+                                                  args.validate_every, args.out_weight, args.balance), daemon=True)
              for i in range(args.workers)]
     for p in procs:
         p.start()
