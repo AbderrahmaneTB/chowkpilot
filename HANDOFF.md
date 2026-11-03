@@ -131,9 +131,12 @@ Then:
 The test junctions must stay clean: choose between models with `select --revalidate` scores, never with
 `results/benchmark.json`. Ranked by expected gain per hour:
 
-1. **Checkpoint ensemble (implemented, not yet measured).** `select --revalidate 3 --ensemble` scores the mean-Q
-   ensemble of the 3 best checkpoints on the same validation seeds. It deploys the ensemble only if it beats the best
-   single checkpoint. `NumpyPolicy` loads ensembles saved as `m0/…`, `m1/…`, and `tests/test_core.py` covers it.
+1. **Checkpoint ensemble: measured, no gain for run 4.** Overnight, `select --revalidate 3 --ensemble` scored:
+   - u002000: **0.922** (first pass 0.906), still deployed;
+   - u016000: 1.004 and u012000: 1.005, level with actuated;
+   - their mean-Q ensemble: 0.951.
+
+   Re-try the ensemble on any new run's checkpoints; the code is ready (`NumpyPolicy` loads `m0/…`, `m1/…`).
 2. **Give the policy the information actuated control uses.** Actuated wins on the isolated junction because it reacts
    to gaps in arrivals. Add per-movement features:
    - time since a vehicle last crossed the stop line (a gap measure);
