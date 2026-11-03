@@ -195,6 +195,7 @@ def main():
     ap.add_argument("--ckpt-every", type=int, default=2000, help="save a numbered checkpoint every N updates")
     ap.add_argument("--lr-min", type=float, default=3e-5, help="cosine-decayed learning rate at the end")
     ap.add_argument("--threads", type=int, default=2)
+    ap.add_argument("--device", default="cpu", help="learner device, e.g. cuda (SUMO workers always run on CPU)")
     ap.add_argument("--out-weight", type=float, default=0.0,
                     help="weight of exit-road delay in the reward (neighbourhood coupling)")
     ap.add_argument("--out", default="models")
@@ -220,7 +221,8 @@ def main():
     weights_path = os.path.abspath(os.path.join(args.out, "chowkpilot_live.npz"))
     final_path = os.path.abspath(os.path.join(args.out, "chowkpilot.npz"))
 
-    model = torch_model(FM, FP)
+    device = torch.device(args.device)
+    model = torch_model(FM, FP).to(device)
     target = copy.deepcopy(model)
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
     replay = Replay(args.capacity)
@@ -292,7 +294,7 @@ def main():
             while replay.size >= args.warmup and budget >= 1 and time.time() < deadline:
                 b = replay.sample(args.batch, rng)
                 t = {k: torch.from_numpy(np.asarray(v, dtype=np.float32 if v.dtype in (np.float16, bool) else v.dtype))
-                     for k, v in b.items()}
+                     .to(device) for k, v in b.items()}
                 q = model(t["mv"], t["ph"], t["mask"], t["mvalid"])
                 q_sa = q.gather(1, t["a"].unsqueeze(1)).squeeze(1)
                 with torch.no_grad():
@@ -337,7 +339,7 @@ def main():
         stop_ev.set()
         save(weights_path, updates)
         save(final_path, updates)
-        torch.save(model.state_dict(), os.path.join(args.out, "chowkpilot.pt"))
+        torch.save({k: v.cpu() for k, v in model.state_dict().items()}, os.path.join(args.out, "chowkpilot.pt"))
         log["baseline_validation"] = read_cache() or log["baseline_validation"]
         with open(os.path.join(args.out, "train_log.json"), "w") as f:
             json.dump(log, f, indent=1)

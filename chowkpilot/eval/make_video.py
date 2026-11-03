@@ -166,7 +166,7 @@ def main():
     fade(card([("How ChowkPilot works", 44, True, TEXT),
                ("1. Camera-style counts from the last 150 m of every lane", 26, False, TEXT),
                ("2. A learned version of max-pressure scores every signal phase", 26, False, TEXT),
-               ("3. One 38k-parameter policy for any junction layout (deep RL, Double DQN)", 26, False, TEXT),
+               ("3. One 30k-parameter policy for any junction layout (deep RL, Double DQN)", 26, False, TEXT),
                ("4. Safety layer: min/max green, yellow, all-red, max-red, ambulance corridor", 26, False, TEXT),
                ("Simulated in SUMO digital twins built from OpenStreetMap,", 22, False, MUTED),
                ("with two-wheelers filtering between cars and left-hand driving.", 22, False, MUTED)]),

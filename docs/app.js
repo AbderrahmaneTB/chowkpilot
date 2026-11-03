@@ -502,9 +502,25 @@ async function init() {
   };
   $("labScenario").onchange = fillConds; fillConds();
   $("btnLoadCond").onclick = loadCondition;
+  // baseline menu lists only the replays recorded for the selected junction
+  const fillBaselines = () => {
+    const s = list.find((x) => x.id === $("selScenario").value), cur = $("selBaseline").value;
+    const avail = ["fixed", "webster", "actuated", "maxpressure"].filter((c) => s && s.replays.includes(c));
+    $("selBaseline").innerHTML = avail.map((c) => `<option value="${c}">${CTRL_NAMES[c]}</option>`).join("");
+    if (avail.includes(cur)) $("selBaseline").value = cur;
+  };
   const reload = () => loadScenario($("selScenario").value, $("selBaseline").value);
-  $("selScenario").onchange = reload; $("selBaseline").onchange = reload;
-  if (list.length) await loadScenario($("selScenario").value, "fixed");
+  $("selScenario").onchange = () => { fillBaselines(); reload(); };
+  $("selBaseline").onchange = reload;
+  // deep links, e.g. #scenario=hyd_hitech&baseline=actuated&t=600&junction=1&view=twin
+  const link = new URLSearchParams(location.hash.includes("=") ? location.hash.slice(1) : "");
+  if (list.some((s) => s.id === link.get("scenario") && s.replays.length)) $("selScenario").value = link.get("scenario");
+  fillBaselines();
+  if ([...$("selBaseline").options].some((o) => o.value === link.get("baseline"))) $("selBaseline").value = link.get("baseline");
+  if (list.length) await loadScenario($("selScenario").value, $("selBaseline").value);
+  if (link.has("t")) state.t = Math.max(0, Math.min(state.tmax, Number(link.get("t")) || 0));
+  if ([...$("selJunction").options].some((o) => o.value === link.get("junction"))) $("selJunction").value = link.get("junction");
+  if (link.has("view") && $(link.get("view"))) $(link.get("view")).scrollIntoView();
   fetch("api/healthz").then((r) => (r.ok ? r.json() : null)).then((h) => { if (h && h.live) $("liveBox").classList.remove("hidden"); }).catch(() => {});
   requestAnimationFrame(tick);
   loadBenchmark();

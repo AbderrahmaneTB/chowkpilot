@@ -9,7 +9,7 @@
 
 ChowkPilot is a reinforcement-learning traffic-signal controller built for Indian junctions. Every few
 seconds it decides which approach gets green, using only what a roadside camera can count. One small
-network (38k parameters) drives **any** junction layout: 3-arm, 4-arm, 5-arm, or a joined
+network (30k parameters) drives **any** junction layout: 3-arm, 4-arm, 5-arm, or a joined
 OpenStreetMap cluster with any number of phases. It was trained on synthetic junctions and two real
 Hyderabad areas, then evaluated **zero-shot on three real Hyderabad areas it never saw**, in a
 simulator configured for Indian traffic: lane-less two-wheelers, autos, buses, left-hand driving and
@@ -92,7 +92,7 @@ that structure, takes the max-pressure score as an input, and **learns a correct
   waiting time, exit-road occupancy for spillback, ambulance flag, lane count, currently green).
 - For each phase *p*: **sum**-pool `e_m` over the movements it releases and over the movements it keeps waiting,
   append 5 phase features (is current, time in green, time since last served, share of movements, max-pressure
-  score), then `Q(p) = ψ(·)`. The network has 38k parameters and the same weights serve every junction.
+  score), then `Q(p) = ψ(·)`. The network has 30,209 parameters and the same weights serve every junction.
 - **Training** (`chowkpilot/rl/train.py`): Double DQN with a semi-Markov formulation. Each decision lasts until the
   junction's next decision point, and rewards are discounted per second. The reward is the ground-truth
   **delay rate** (Σ vehicles × (1 − v / v_max)) on the junction's approaches, plus half the delay on its exit
@@ -220,7 +220,7 @@ tests/         unit tests
 | **Task** | Choose the next green phase of a signalised junction every 5 s (after the minimum green) |
 | **Inputs** | Per movement: stopped and moving vehicles, occupancy and mean waiting time in the last 150 m of each lane, exit-road occupancy, ambulance flag, lane count, currently green. Per phase: is current, time in green, time since last served, share of movements, max-pressure score |
 | **Output** | A score per candidate phase; the safety layer applies the highest-scoring *allowed* phase |
-| **Model** | Deep-sets phase scorer, 38k parameters, NumPy inference (about 0.15 ms per decision) |
+| **Model** | Deep-sets phase scorer, 30k parameters, NumPy inference (about 0.15 ms per decision) |
 | **Training data** | Simulated only: 11 synthetic layouts and 2 real Hyderabad areas (Gachibowli, Abids) in SUMO, randomised demand, time-of-day profiles, ambulances and camera noise |
 | **Evaluation** | 3 unseen real Hyderabad areas, 10 paired seeds, 4 baselines, robustness conditions (see Results) |
 | **Intended use** | Decision support and pilots for traffic engineers: shadow mode first, then supervised control at camera-equipped junctions |
