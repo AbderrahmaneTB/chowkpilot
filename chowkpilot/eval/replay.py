@@ -116,8 +116,10 @@ def record(scenario_id: str, controller: str, seed: int = 1, duration: int = 900
 
 def save_replay(res: dict, path: str):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with gzip.open(path, "wt", encoding="utf-8") as f:
+    tmp = path + ".tmp"  # an interrupted run never leaves a truncated replay behind
+    with gzip.open(tmp, "wt", encoding="utf-8") as f:
         json.dump(res, f, separators=(",", ":"))
+    os.replace(tmp, path)
 
 
 def load_replay(path: str) -> dict:

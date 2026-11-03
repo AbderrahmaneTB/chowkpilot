@@ -73,13 +73,22 @@ What this tells us:
 
 Full log: `models/train_log.json`. All checkpoints: `models/checkpoints/`.
 
-## P0: finish a complete, honest submission first (≈ 2 h, safety net)
+## P0: finish a complete, honest submission first (≈ 3 h, safety net)
 
-Run in the repo root. Prefix commands with `PYTHONIOENCODING=utf-8` on Windows.
+**First check `results/finalize.log`.** Session 1 started `bash tools/finalize.sh` (all the steps below) on the
+first laptop at about 02:42 on 3 Nov.
+- If the log ends with `finalize done`, every output exists: review them (numbers, GIF, video, README tables) and go
+  to the "Then" list.
+- If it stopped part-way (laptop asleep or window closed), re-run the remaining steps, or the whole script:
+  `PYTHON=<venv python> bash tools/finalize.sh 10`.
+
+Run in the repo root. Prefix commands with `PYTHONIOENCODING=utf-8` on Windows. The selection step takes about 8 min.
+To check the pipeline end to end before the full benchmark, run it once with `--seeds 2 --skip-robustness`
+(about 10 min).
 
 ```bash
 python -m chowkpilot.rl.select --revalidate 3 --ensemble --workers 10   # robust pick (validation only) -> models/chowkpilot.npz
-python -m chowkpilot.eval.benchmark --seeds 10 --workers 10   # 3 unseen junctions -> results/benchmark.json (~30 min)
+python -m chowkpilot.eval.benchmark --seeds 10 --workers 10   # 3 unseen junctions -> results/benchmark.json (~1-1.5 h, ~480 runs)
 python -m chowkpilot.eval.make_replays --workers 10           # demo replays -> docs/data/replays (~15 min)
 python -m chowkpilot.eval.export_site                         # docs/data/scenarios.json, network/, benchmark.json
 python -m chowkpilot.eval.figures                             # docs/img/*-light.png / *-dark.png

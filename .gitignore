@@ -16,3 +16,4 @@ results/tmp/
 Thumbs.db
 docs/data/replays/
 .claude/
+models/ensemble.npz

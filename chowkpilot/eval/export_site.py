@@ -19,7 +19,7 @@ from .replay import REPLAY_DIR, SITE_DATA, network_geometry
 
 def main():
     os.makedirs(os.path.join(SITE_DATA, "network"), exist_ok=True)
-    files = set(os.listdir(REPLAY_DIR)) if os.path.isdir(REPLAY_DIR) else set()
+    files = {f for f in os.listdir(REPLAY_DIR) if f.endswith(".json.gz")} if os.path.isdir(REPLAY_DIR) else set()
     by_id = {s.id: s for s in registry.load_all()}
     catalogue = []
     for sid in DEMO:
