@@ -28,7 +28,7 @@ import traceback
 import numpy as np
 
 M_MAX, P_MAX = 32, 8
-FM, FP = 8, 5
+FM, FP = 10, 5  # = MOVEMENT_FEATURES, PHASE_FEATURES in chowkpilot.env.sim
 VALIDATION = [  # (scenario, seed, demand overrides) on training networks only, seeds never used for testing
     ("syn_single_2lane_inc", 4242, {"scale": 1.0, "profile": "peak"}),
     ("syn_single_2lane_inc", 5252, {"scale": 1.0, "profile": "peak"}),

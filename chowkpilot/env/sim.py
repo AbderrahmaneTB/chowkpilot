@@ -34,7 +34,7 @@ from ..scenarios.vtypes import TYPE_INDEX
 from ..sumo_paths import binary
 from .junction import JunctionModel
 
-MOVEMENT_FEATURES = 8
+MOVEMENT_FEATURES = 10  # policies trained with the first 8 (before the gap features) still run: see NumpyPolicy
 PHASE_FEATURES = 5
 TYPE_BY_PREFIX = {name[:2]: idx for name, idx in TYPE_INDEX.items()}
 AMBULANCE_PREFIX = "am"
@@ -186,12 +186,17 @@ class Simulation:
         return halt, veh, occ, ev
 
     def observe(self, j: int):
-        """Per-movement features [M, 8] and per-phase features [P, 5] for junction j."""
+        """Per-movement features [M, 10] and per-phase features [P, 5] for junction j."""
         jm = self.junctions[j]
         halt, veh, occ, ev = self.lane_counts(jm)
         wait = np.array([traci.lane.getWaitingTime(l) for l in jm.in_lanes])
         out_occ = np.array([traci.lane.getLastStepOccupancy(l) / 100.0 for l in jm.out_lanes])
         out_veh = np.array([traci.lane.getLastStepVehicleNumber(l) for l in jm.out_lanes], dtype=float)
+        gap = np.array([traci.inductionloop.getTimeSinceDetection("e1_" + l) for l in jm.in_lanes])
+        near = np.array([max(0, traci.lanearea.getLastStepVehicleNumber("e2n_" + l)  # halting can exceed present
+                             - traci.lanearea.getLastStepHaltingNumber("e2n_" + l)) for l in jm.in_lanes])
+        if self.cfg.miss_prob > 0:
+            near = self.rng.binomial(near, 1.0 - self.cfg.miss_prob)
         M = jm.num_movements
         mv = np.zeros((M, MOVEMENT_FEATURES), dtype=np.float32)
         cur_mask = jm.mask[self.phase[j]] if self.mode[j] == "G" else jm.mask[self.next_phase[j]]
@@ -206,6 +211,8 @@ class Simulation:
             mv[m, 5] = ev[li].max()
             mv[m, 6] = len(li) / 3.0
             mv[m, 7] = float(cur_mask[m])
+            mv[m, 8] = min(1.0, gap[li].min() / 10.0)  # seconds since a vehicle last crossed the stop line
+            mv[m, 9] = near[li].sum() / 5.0            # moving vehicles in the last 50 m: arrivals a green would serve
         P = jm.num_phases
         t = traci.simulation.getTime()
         ph = np.zeros((P, PHASE_FEATURES), dtype=np.float32)

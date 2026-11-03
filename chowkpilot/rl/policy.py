@@ -63,6 +63,7 @@ class NumpyPolicy:
         if self.members:
             return np.mean([m.q_values(mv, ph, mask) for m in self.members], axis=0)
         p = self.p
+        mv = mv[:, :p["phi1.weight"].shape[1]]  # features are only ever appended: older policies read the first ones
         e = _relu(mv @ p["phi1.weight"].T + p["phi1.bias"])
         e = _relu(e @ p["phi2.weight"].T + p["phi2.bias"])          # [M, H]
         g = mask.astype(np.float32)
