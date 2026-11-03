@@ -247,11 +247,17 @@ Rules:
 - Logins, the Devpost submission and the YouTube upload are done by the team.
 - Never submit the final entry without asking the team first and getting an explicit yes.
 
+Who does what: run `git config user.name` and `git pull` first.
+- AbderrahmaneTB's laptop owns P0 and main-branch releases. Start by checking results/finalize.log: an overnight
+  run of tools/finalize.sh may already have produced every result.
+- WaelYTz's machine (NVIDIA GPU) does P1 item 3 first: a training experiment in models_w/ that it reports back.
+  Push only to a branch, and merge only after the team agrees.
+
 Work autonomously, in this order:
-P0: finish a complete, honest submission with the current model (select --revalidate, benchmark, replays,
-    site export, figures, README tables, GIF, video, screenshots), push it and verify the live site.
+P0: finish a complete, honest submission with the current model (select --revalidate --ensemble, benchmark,
+    replays, site export, figures, README tables, GIF, video, screenshots), push it and verify the live site.
 P1: improve the model, judging every change on validation only; run the test benchmark once per release.
-P2: tests + GitHub Actions CI.
+P2: the remaining tests and site checks (CI already runs on every push).
 P3: README and site design polish, then the Devpost text with the final numbers.
 
 Report progress briefly. Ask only for things that need a person: full names, logins, the video upload, the
