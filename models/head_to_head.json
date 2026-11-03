@@ -1,0 +1,58 @@
+{
+ "seeds": [
+  9191,
+  10101,
+  11111
+ ],
+ "rule": "lower score wins; a gap below 0.01 keeps the simpler model",
+ "decision": "run 5b ensemble adopted (0.853 vs 0.898)",
+ "actuated": {
+  "syn_single_2lane_inc@9191": 35.931842870999034,
+  "syn_single_2lane_inc@10101": 29.392772511848342,
+  "syn_single_2lane_inc@11111": 26.195990639625588,
+  "syn_arterial3@9191": 98.85673469387754,
+  "syn_arterial3@10101": 139.32014257620455,
+  "syn_arterial3@11111": 75.63257585539057,
+  "hyd_gachibowli@9191": 351.57843149411036,
+  "hyd_gachibowli@10101": 240.15572211155376,
+  "hyd_gachibowli@11111": 175.2034954954955
+ },
+ "models/run4/chowkpilot.npz": {
+  "score": 0.8982329929201155,
+  "per_layout": {
+   "syn_single_2lane_inc": 1.1157912698030537,
+   "syn_arterial3": 0.8004567628402249,
+   "hyd_gachibowli": 0.7784509461170678
+  },
+  "delay": {
+   "syn_single_2lane_inc@9191": 37.424248302618814,
+   "syn_single_2lane_inc@10101": 34.970841232227485,
+   "syn_single_2lane_inc@11111": 29.23636505460219,
+   "syn_arterial3@9191": 60.21781025923884,
+   "syn_arterial3@10101": 163.2514355948869,
+   "syn_arterial3@11111": 46.92669464170432,
+   "hyd_gachibowli@9191": 278.0067885926845,
+   "hyd_gachibowli@10101": 188.28101095617527,
+   "hyd_gachibowli@11111": 133.262981981982
+  }
+ },
+ "models/chowkpilot.npz": {
+  "score": 0.8526730171251659,
+  "per_layout": {
+   "syn_single_2lane_inc": 1.1102287944954112,
+   "syn_arterial3": 0.7439628869541487,
+   "hyd_gachibowli": 0.7038273699259375
+  },
+  "delay": {
+   "syn_single_2lane_inc@9191": 35.85841901066925,
+   "syn_single_2lane_inc@10101": 38.44114928909953,
+   "syn_single_2lane_inc@11111": 26.847909516380653,
+   "syn_arterial3@9191": 59.08608383894098,
+   "syn_arterial3@10101": 144.63727630285155,
+   "syn_arterial3@11111": 45.079264041316975,
+   "hyd_gachibowli@9191": 262.3072287662741,
+   "hyd_gachibowli@10101": 167.28195219123506,
+   "hyd_gachibowli@11111": 117.18335135135136
+  }
+ }
+}

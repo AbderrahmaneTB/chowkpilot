@@ -1,0 +1,1071 @@
+{
+ "args": {
+  "minutes": 75.0,
+  "workers": 8,
+  "capacity": 400000,
+  "batch": 256,
+  "lr": 0.0003,
+  "gamma": 0.985,
+  "tau": 0.005,
+  "warmup": 5000,
+  "replay_ratio": 0.25,
+  "eps_start": 0.7,
+  "eps_end": 0.1,
+  "eps_decay_frac": 0.6,
+  "validate_every": 6,
+  "ckpt_every": 2000,
+  "lr_min": 3e-05,
+  "threads": 3,
+  "out_weight": 0.5,
+  "out": "models",
+  "seed": 0,
+  "baselines_only": false
+ },
+ "baseline_validation": {
+  "fixed": {
+   "syn_single_2lane_inc@4242": 48.055797280593325,
+   "syn_single_2lane_inc@5252": 88.430030651341,
+   "syn_arterial3@4243": 224.2742032686415,
+   "syn_arterial3@5253": 88.75818390804598,
+   "hyd_gachibowli@4244": 426.0763280662152
+  },
+  "actuated": {
+   "syn_single_2lane_inc@4242": 31.149419035846726,
+   "syn_single_2lane_inc@5252": 73.72475862068966,
+   "syn_arterial3@4243": 119.98103166496425,
+   "syn_arterial3@5253": 76.36573563218391,
+   "hyd_gachibowli@4244": 209.11069977426635
+  },
+  "maxpressure": {
+   "syn_single_2lane_inc@4242": 32.063275648949315,
+   "syn_single_2lane_inc@5252": 110.75649042145592,
+   "syn_arterial3@4243": 130.85192032686413,
+   "syn_arterial3@5253": 52.69755747126437,
+   "hyd_gachibowli@4244": 233.62371708051165
+  }
+ },
+ "curve": [
+  {
+   "minutes": 1.0,
+   "env_steps": 6765,
+   "updates": 200,
+   "eps": 0.689,
+   "replay": 6765,
+   "loss": 0.314907679669559,
+   "q": -0.6503384741698391,
+   "ret_per_decision": -1.9231582502421845,
+   "episodes": 7,
+   "sim_sec_per_episode": 9.840831313814435
+  },
+  {
+   "minutes": 2.2,
+   "env_steps": 11775,
+   "updates": 500,
+   "eps": 0.673,
+   "replay": 11775,
+   "loss": 0.6354724434018135,
+   "q": -3.4567572871843972,
+   "ret_per_decision": -9.429990809865426,
+   "episodes": 8,
+   "sim_sec_per_episode": 49.14707651734352
+  },
+  {
+   "minutes": 3.5,
+   "env_steps": 18260,
+   "updates": 800,
+   "eps": 0.66,
+   "replay": 18260,
+   "loss": 0.7389035572608312,
+   "q": -7.302631508509318,
+   "ret_per_decision": -10.448685499151113,
+   "episodes": 9,
+   "sim_sec_per_episode": 53.837758011288116
+  },
+  {
+   "minutes": 4.6,
+   "env_steps": 34696,
+   "updates": 1050,
+   "eps": 0.644,
+   "replay": 34696,
+   "loss": 1.0620355799198151,
+   "q": -13.282820552825928,
+   "ret_per_decision": -11.732936695371464,
+   "episodes": 24,
+   "sim_sec_per_episode": 38.71786771217982
+  },
+  {
+   "minutes": 5.6,
+   "env_steps": 56684,
+   "updates": 1250,
+   "eps": 0.629,
+   "replay": 56684,
+   "loss": 1.0544078043103218,
+   "q": -14.011873545646667,
+   "ret_per_decision": -5.752965752046704,
+   "episodes": 26,
+   "sim_sec_per_episode": 18.581439724335304
+  },
+  {
+   "minutes": 6.7,
+   "env_steps": 62446,
+   "updates": 1550,
+   "eps": 0.613,
+   "replay": 62446,
+   "loss": 1.1697651068369548,
+   "q": -16.022383788426716,
+   "ret_per_decision": -7.925417748402363,
+   "episodes": 10,
+   "sim_sec_per_episode": 39.478900456428526
+  },
+  {
+   "minutes": 7.8,
+   "env_steps": 71947,
+   "updates": 1850,
+   "eps": 0.599,
+   "replay": 71947,
+   "loss": 1.297790951927503,
+   "q": -18.08062426884969,
+   "ret_per_decision": -4.713339970904355,
+   "episodes": 15,
+   "sim_sec_per_episode": 37.23586111068725
+  },
+  {
+   "minutes": 8.8,
+   "env_steps": 89276,
+   "updates": 2100,
+   "eps": 0.584,
+   "replay": 89276,
+   "loss": 1.5088313703536986,
+   "q": -20.523238796234132,
+   "ret_per_decision": -7.2906321100566425,
+   "episodes": 26,
+   "sim_sec_per_episode": 27.206558640186604
+  },
+  {
+   "minutes": 9.9,
+   "env_steps": 98485,
+   "updates": 2850,
+   "eps": 0.57,
+   "replay": 98485,
+   "loss": 1.6910391499201456,
+   "q": -23.352287478129067,
+   "ret_per_decision": -6.1874650197521674,
+   "episodes": 17,
+   "sim_sec_per_episode": 16.235522424473483
+  },
+  {
+   "minutes": 11.0,
+   "env_steps": 103664,
+   "updates": 3000,
+   "eps": 0.566,
+   "replay": 103664,
+   "loss": 1.8589919630686442,
+   "q": -26.006676483154298,
+   "ret_per_decision": -10.349428292829785,
+   "episodes": 7,
+   "sim_sec_per_episode": 38.321905442646575
+  },
+  {
+   "minutes": 12.2,
+   "env_steps": 135550,
+   "updates": 3500,
+   "eps": 0.54,
+   "replay": 135550,
+   "loss": 1.8324811844825744,
+   "q": -26.253732292175293,
+   "ret_per_decision": -5.900066190972665,
+   "episodes": 43,
+   "sim_sec_per_episode": 20.686172635056252
+  },
+  {
+   "minutes": 13.2,
+   "env_steps": 149114,
+   "updates": 3900,
+   "eps": 0.525,
+   "replay": 149114,
+   "loss": 1.9492639744281768,
+   "q": -27.787475028038024,
+   "ret_per_decision": -9.924573847225284,
+   "episodes": 23,
+   "sim_sec_per_episode": 21.742463972257532
+  },
+  {
+   "minutes": 14.2,
+   "env_steps": 167901,
+   "updates": 5300,
+   "eps": 0.511,
+   "replay": 167901,
+   "loss": 2.0703129376683918,
+   "q": -29.860437673841204,
+   "ret_per_decision": -5.575647496664255,
+   "episodes": 26,
+   "sim_sec_per_episode": 17.521951409486626
+  },
+  {
+   "minutes": 15.2,
+   "env_steps": 181606,
+   "updates": 5950,
+   "eps": 0.498,
+   "replay": 181606,
+   "loss": 2.1312534288259655,
+   "q": -30.647419970585748,
+   "ret_per_decision": -6.201213421833798,
+   "episodes": 21,
+   "sim_sec_per_episode": 21.179354043233964
+  },
+  {
+   "minutes": 16.4,
+   "env_steps": 196803,
+   "updates": 6500,
+   "eps": 0.485,
+   "replay": 196803,
+   "loss": 2.160467940677296,
+   "q": -31.588968693126333,
+   "ret_per_decision": -6.0288992969567445,
+   "episodes": 19,
+   "sim_sec_per_episode": 24.69080228554575
+  },
+  {
+   "minutes": 18.2,
+   "env_steps": 206276,
+   "updates": 6650,
+   "eps": 0.47,
+   "replay": 206276,
+   "loss": 2.1472308508555096,
+   "q": -31.321649080912273,
+   "ret_per_decision": -9.025524784252527,
+   "episodes": 11,
+   "sim_sec_per_episode": 33.98623514175415
+  },
+  {
+   "minutes": 19.3,
+   "env_steps": 232341,
+   "updates": 6850,
+   "eps": 0.449,
+   "replay": 232341,
+   "loss": 2.1513285571336747,
+   "q": -31.504101905822754,
+   "ret_per_decision": -5.54066091108096,
+   "episodes": 36,
+   "sim_sec_per_episode": 18.2907580865754
+  },
+  {
+   "minutes": 20.4,
+   "env_steps": 266881,
+   "updates": 7200,
+   "eps": 0.43,
+   "replay": 266881,
+   "loss": 2.0322572428839547,
+   "q": -29.95437134878976,
+   "ret_per_decision": -8.321822584364279,
+   "episodes": 47,
+   "sim_sec_per_episode": 18.47049219050306
+  },
+  {
+   "minutes": 21.5,
+   "env_steps": 281926,
+   "updates": 8400,
+   "eps": 0.416,
+   "replay": 281926,
+   "loss": 2.056909828086694,
+   "q": -30.012138271331786,
+   "ret_per_decision": -6.4082140402985255,
+   "episodes": 26,
+   "sim_sec_per_episode": 19.28092437524062
+  },
+  {
+   "minutes": 22.5,
+   "env_steps": 299244,
+   "updates": 9800,
+   "eps": 0.4,
+   "replay": 299244,
+   "loss": 2.069312614883695,
+   "q": -30.185652866363526,
+   "ret_per_decision": -5.444495327992348,
+   "episodes": 27,
+   "sim_sec_per_episode": 15.96620183520847
+  },
+  {
+   "minutes": 23.6,
+   "env_steps": 316873,
+   "updates": 11350,
+   "eps": 0.386,
+   "replay": 316873,
+   "loss": 2.036975523579505,
+   "q": -29.823346562539378,
+   "ret_per_decision": -5.6174332364576385,
+   "episodes": 21,
+   "sim_sec_per_episode": 28.023608741306123
+  },
+  {
+   "minutes": 24.6,
+   "env_steps": 331179,
+   "updates": 12850,
+   "eps": 0.372,
+   "replay": 331179,
+   "loss": 2.0746455187002817,
+   "q": -30.108845839182536,
+   "ret_per_decision": -7.5151946907781415,
+   "episodes": 22,
+   "sim_sec_per_episode": 24.669228293678977
+  },
+  {
+   "minutes": 25.6,
+   "env_steps": 343719,
+   "updates": 14250,
+   "eps": 0.359,
+   "replay": 343719,
+   "loss": 2.085806174278259,
+   "q": -30.397663905279977,
+   "ret_per_decision": -7.561707209304266,
+   "episodes": 17,
+   "sim_sec_per_episode": 22.69368058092454
+  },
+  {
+   "minutes": 26.7,
+   "env_steps": 360410,
+   "updates": 15000,
+   "eps": 0.345,
+   "replay": 360410,
+   "loss": 2.0439798844655357,
+   "q": -29.758045115152996,
+   "ret_per_decision": -6.192352152438178,
+   "episodes": 17,
+   "sim_sec_per_episode": 16.049452711554135
+  },
+  {
+   "minutes": 27.8,
+   "env_steps": 374151,
+   "updates": 15600,
+   "eps": 0.331,
+   "replay": 374151,
+   "loss": 2.0453461386760075,
+   "q": -29.990110228856405,
+   "ret_per_decision": -10.345948014204028,
+   "episodes": 23,
+   "sim_sec_per_episode": 34.03294759211333
+  },
+  {
+   "minutes": 28.8,
+   "env_steps": 397718,
+   "updates": 16950,
+   "eps": 0.317,
+   "replay": 397718,
+   "loss": 2.0331703742345173,
+   "q": -29.790278827525952,
+   "ret_per_decision": -4.098329136565778,
+   "episodes": 35,
+   "sim_sec_per_episode": 10.930667468479701
+  },
+  {
+   "minutes": 29.8,
+   "env_steps": 411244,
+   "updates": 18000,
+   "eps": 0.304,
+   "replay": 400000,
+   "loss": 2.0528895397413343,
+   "q": -30.034827713739304,
+   "ret_per_decision": -5.481854333502065,
+   "episodes": 20,
+   "sim_sec_per_episode": 19.331844329833984
+  },
+  {
+   "minutes": 30.8,
+   "env_steps": 421520,
+   "updates": 18650,
+   "eps": 0.291,
+   "replay": 400000,
+   "loss": 2.00712397978856,
+   "q": -29.768926382798416,
+   "ret_per_decision": -8.774489607692004,
+   "episodes": 16,
+   "sim_sec_per_episode": 20.73052741587162
+  },
+  {
+   "minutes": 31.9,
+   "env_steps": 435120,
+   "updates": 19300,
+   "eps": 0.276,
+   "replay": 400000,
+   "loss": 1.992889169729673,
+   "q": -29.14372563288762,
+   "ret_per_decision": -8.585815078522197,
+   "episodes": 21,
+   "sim_sec_per_episode": 27.463332505453202
+  },
+  {
+   "minutes": 33.0,
+   "env_steps": 451106,
+   "updates": 19900,
+   "eps": 0.262,
+   "replay": 400000,
+   "loss": 2.0205996654431027,
+   "q": -29.535200363794964,
+   "ret_per_decision": -4.803225808566359,
+   "episodes": 29,
+   "sim_sec_per_episode": 20.28935198126168
+  },
+  {
+   "minutes": 34.0,
+   "env_steps": 475066,
+   "updates": 21800,
+   "eps": 0.247,
+   "replay": 400000,
+   "loss": 2.0050796304878435,
+   "q": -29.350497574053314,
+   "ret_per_decision": -6.192418776827612,
+   "episodes": 34,
+   "sim_sec_per_episode": 14.622353834264418
+  },
+  {
+   "minutes": 35.0,
+   "env_steps": 491401,
+   "updates": 23100,
+   "eps": 0.234,
+   "replay": 400000,
+   "loss": 1.9261575803389916,
+   "q": -28.342078832479622,
+   "ret_per_decision": -5.7686080178310615,
+   "episodes": 26,
+   "sim_sec_per_episode": 17.758453662578876
+  },
+  {
+   "minutes": 36.1,
+   "env_steps": 507973,
+   "updates": 24050,
+   "eps": 0.221,
+   "replay": 400000,
+   "loss": 1.9092912342673853,
+   "q": -28.085164732682077,
+   "ret_per_decision": -4.582855212275861,
+   "episodes": 22,
+   "sim_sec_per_episode": 18.425457260825418
+  },
+  {
+   "minutes": 37.1,
+   "env_steps": 521333,
+   "updates": 24600,
+   "eps": 0.207,
+   "replay": 400000,
+   "loss": 1.8900244819034229,
+   "q": -27.541254019303754,
+   "ret_per_decision": -6.372565649344192,
+   "episodes": 18,
+   "sim_sec_per_episode": 21.899930675824482
+  },
+  {
+   "minutes": 38.1,
+   "env_steps": 539675,
+   "updates": 25200,
+   "eps": 0.194,
+   "replay": 400000,
+   "loss": 1.893045111099879,
+   "q": -27.66700578371684,
+   "ret_per_decision": -8.875738118742936,
+   "episodes": 24,
+   "sim_sec_per_episode": 23.014626274506252
+  },
+  {
+   "minutes": 39.1,
+   "env_steps": 563909,
+   "updates": 26600,
+   "eps": 0.179,
+   "replay": 400000,
+   "loss": 1.8234602550097874,
+   "q": -26.807657752718246,
+   "ret_per_decision": -6.116031642905816,
+   "episodes": 33,
+   "sim_sec_per_episode": 14.15579758268414
+  },
+  {
+   "minutes": 40.1,
+   "env_steps": 579646,
+   "updates": 27550,
+   "eps": 0.166,
+   "replay": 400000,
+   "loss": 1.8082635235786437,
+   "q": -26.705740735907305,
+   "ret_per_decision": -7.85550407491678,
+   "episodes": 20,
+   "sim_sec_per_episode": 20.21709145307541
+  },
+  {
+   "minutes": 41.1,
+   "env_steps": 597225,
+   "updates": 28700,
+   "eps": 0.152,
+   "replay": 400000,
+   "loss": 1.8166876661259195,
+   "q": -26.997564020571502,
+   "ret_per_decision": -6.422768855443131,
+   "episodes": 19,
+   "sim_sec_per_episode": 19.40613933613426
+  },
+  {
+   "minutes": 42.2,
+   "env_steps": 606027,
+   "updates": 29350,
+   "eps": 0.139,
+   "replay": 400000,
+   "loss": 1.8326989091359651,
+   "q": -26.850956966693584,
+   "ret_per_decision": -8.357764392971374,
+   "episodes": 14,
+   "sim_sec_per_episode": 20.719429867608206
+  },
+  {
+   "minutes": 43.2,
+   "env_steps": 613960,
+   "updates": 30000,
+   "eps": 0.125,
+   "replay": 400000,
+   "loss": 1.8405356968366182,
+   "q": -27.3865504015409,
+   "ret_per_decision": -11.198727067931708,
+   "episodes": 10,
+   "sim_sec_per_episode": 32.7174346446991
+  },
+  {
+   "minutes": 44.3,
+   "env_steps": 624749,
+   "updates": 30900,
+   "eps": 0.111,
+   "replay": 400000,
+   "loss": 1.8338768258359697,
+   "q": -27.495897329118517,
+   "ret_per_decision": -4.589294188031055,
+   "episodes": 13,
+   "sim_sec_per_episode": 30.595530454929058
+  },
+  {
+   "minutes": 45.4,
+   "env_steps": 639076,
+   "updates": 31300,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 1.8658754566311837,
+   "q": -28.067585344314576,
+   "ret_per_decision": -8.345413559730371,
+   "episodes": 19,
+   "sim_sec_per_episode": 39.486173692502476
+  },
+  {
+   "minutes": 46.4,
+   "env_steps": 648460,
+   "updates": 31650,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 1.8769461468287876,
+   "q": -28.350359110151018,
+   "ret_per_decision": -3.481407525816117,
+   "episodes": 14,
+   "sim_sec_per_episode": 22.550161123275757
+  },
+  {
+   "minutes": 47.5,
+   "env_steps": 661485,
+   "updates": 31900,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 1.903516239643097,
+   "q": -28.175958229064943,
+   "ret_per_decision": -7.390668485182999,
+   "episodes": 19,
+   "sim_sec_per_episode": 29.473106083117035
+  },
+  {
+   "minutes": 48.5,
+   "env_steps": 674627,
+   "updates": 32550,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 1.9350549010130076,
+   "q": -29.05198692028339,
+   "ret_per_decision": -10.4536240758583,
+   "episodes": 24,
+   "sim_sec_per_episode": 29.942100793123245
+  },
+  {
+   "minutes": 49.5,
+   "env_steps": 687592,
+   "updates": 34150,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 1.9504527019709348,
+   "q": -28.99199681162834,
+   "ret_per_decision": -9.181554280709816,
+   "episodes": 18,
+   "sim_sec_per_episode": 16.26596240202586
+  },
+  {
+   "minutes": 50.6,
+   "env_steps": 702541,
+   "updates": 35000,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 1.975442328453064,
+   "q": -29.189727103289435,
+   "ret_per_decision": -7.222016583581249,
+   "episodes": 21,
+   "sim_sec_per_episode": 32.9509148370652
+  },
+  {
+   "minutes": 51.6,
+   "env_steps": 724049,
+   "updates": 35650,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 1.9801952305206885,
+   "q": -29.487978395315317,
+   "ret_per_decision": -4.407240466543948,
+   "episodes": 32,
+   "sim_sec_per_episode": 17.385529652237892
+  },
+  {
+   "minutes": 52.7,
+   "env_steps": 739363,
+   "updates": 36250,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 1.9370800894498825,
+   "q": -28.835138635635374,
+   "ret_per_decision": -6.3103419879626,
+   "episodes": 17,
+   "sim_sec_per_episode": 22.61469296848073
+  },
+  {
+   "minutes": 53.7,
+   "env_steps": 750165,
+   "updates": 36900,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 1.9706492717449482,
+   "q": -29.324269171494706,
+   "ret_per_decision": -9.575715792198492,
+   "episodes": 22,
+   "sim_sec_per_episode": 25.8161953904412
+  },
+  {
+   "minutes": 54.8,
+   "env_steps": 769235,
+   "updates": 37550,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 1.9949565408780026,
+   "q": -29.835006458575908,
+   "ret_per_decision": -6.774289165133571,
+   "episodes": 23,
+   "sim_sec_per_episode": 19.91049663916878
+  },
+  {
+   "minutes": 55.9,
+   "env_steps": 785328,
+   "updates": 38200,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 1.9602125989473782,
+   "q": -28.987479855464056,
+   "ret_per_decision": -7.523361132231319,
+   "episodes": 26,
+   "sim_sec_per_episode": 19.567003864508408
+  },
+  {
+   "minutes": 56.9,
+   "env_steps": 804824,
+   "updates": 38800,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 1.9933275185028712,
+   "q": -29.57663412729899,
+   "ret_per_decision": -6.787833455125726,
+   "episodes": 24,
+   "sim_sec_per_episode": 17.51623758673668
+  },
+  {
+   "minutes": 57.9,
+   "env_steps": 813855,
+   "updates": 39400,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.009554557800293,
+   "q": -29.698497797648113,
+   "ret_per_decision": -7.963644691784637,
+   "episodes": 15,
+   "sim_sec_per_episode": 24.710944906870523
+  },
+  {
+   "minutes": 59.0,
+   "env_steps": 825791,
+   "updates": 40050,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.015071388758146,
+   "q": -30.002009623600888,
+   "ret_per_decision": -4.924814571490567,
+   "episodes": 19,
+   "sim_sec_per_episode": 16.504951502147474
+  },
+  {
+   "minutes": 60.0,
+   "env_steps": 836353,
+   "updates": 40650,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.020988485813141,
+   "q": -30.10257311820984,
+   "ret_per_decision": -8.149882145255877,
+   "episodes": 12,
+   "sim_sec_per_episode": 36.02256256341934
+  },
+  {
+   "minutes": 61.0,
+   "env_steps": 842286,
+   "updates": 41300,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.019620935366704,
+   "q": -30.19132407261775,
+   "ret_per_decision": -8.527285765675295,
+   "episodes": 11,
+   "sim_sec_per_episode": 27.830798105760053
+  },
+  {
+   "minutes": 62.1,
+   "env_steps": 851785,
+   "updates": 41950,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.0461480041650626,
+   "q": -30.242538199791543,
+   "ret_per_decision": -5.960326301665431,
+   "episodes": 14,
+   "sim_sec_per_episode": 27.491138918059214
+  },
+  {
+   "minutes": 63.1,
+   "env_steps": 864220,
+   "updates": 42550,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.0336900027592977,
+   "q": -30.139888197580973,
+   "ret_per_decision": -8.84543992533856,
+   "episodes": 14,
+   "sim_sec_per_episode": 72.20448081833976
+  },
+  {
+   "minutes": 64.1,
+   "env_steps": 879133,
+   "updates": 43150,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.0695433259010314,
+   "q": -30.45992148399353,
+   "ret_per_decision": -4.491398014920341,
+   "episodes": 21,
+   "sim_sec_per_episode": 14.147967247735886
+  },
+  {
+   "minutes": 65.2,
+   "env_steps": 890390,
+   "updates": 43800,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.0887620659974906,
+   "q": -30.71495412386381,
+   "ret_per_decision": -8.060745450332666,
+   "episodes": 23,
+   "sim_sec_per_episode": 25.70135269994321
+  },
+  {
+   "minutes": 66.2,
+   "env_steps": 905895,
+   "updates": 44450,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.1174495810728806,
+   "q": -31.187487470186674,
+   "ret_per_decision": -5.712137811285024,
+   "episodes": 22,
+   "sim_sec_per_episode": 21.23291581327265
+  },
+  {
+   "minutes": 67.3,
+   "env_steps": 918429,
+   "updates": 45050,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.1431946617364885,
+   "q": -31.68410818417867,
+   "ret_per_decision": -7.7383387153523016,
+   "episodes": 23,
+   "sim_sec_per_episode": 19.666233974954356
+  },
+  {
+   "minutes": 68.3,
+   "env_steps": 936525,
+   "updates": 45650,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.1273544971148173,
+   "q": -31.610031061172485,
+   "ret_per_decision": -5.754467224321563,
+   "episodes": 25,
+   "sim_sec_per_episode": 16.791026029586792
+  },
+  {
+   "minutes": 69.3,
+   "env_steps": 952857,
+   "updates": 46200,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.1260299476710234,
+   "q": -31.404089997031473,
+   "ret_per_decision": -9.50075406661111,
+   "episodes": 20,
+   "sim_sec_per_episode": 23.395121347904205
+  },
+  {
+   "minutes": 70.3,
+   "env_steps": 966598,
+   "updates": 46800,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.149895107547442,
+   "q": -31.915188824335733,
+   "ret_per_decision": -8.50006875729719,
+   "episodes": 21,
+   "sim_sec_per_episode": 19.69112971850804
+  },
+  {
+   "minutes": 71.3,
+   "env_steps": 979686,
+   "updates": 47350,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.1427074508233503,
+   "q": -31.604453364285554,
+   "ret_per_decision": -4.385797429805874,
+   "episodes": 17,
+   "sim_sec_per_episode": 16.38160784104291
+  },
+  {
+   "minutes": 72.4,
+   "env_steps": 991846,
+   "updates": 47950,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.115951370199521,
+   "q": -30.949061237970987,
+   "ret_per_decision": -5.0792863314835355,
+   "episodes": 16,
+   "sim_sec_per_episode": 22.59061685204506
+  },
+  {
+   "minutes": 73.4,
+   "env_steps": 1002692,
+   "updates": 48550,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.134089127779007,
+   "q": -30.869503208796182,
+   "ret_per_decision": -9.801680949294212,
+   "episodes": 20,
+   "sim_sec_per_episode": 32.059036219120024
+  },
+  {
+   "minutes": 74.4,
+   "env_steps": 1012242,
+   "updates": 49100,
+   "eps": 0.1,
+   "replay": 400000,
+   "loss": 2.1463229983503167,
+   "q": -30.82077527479692,
+   "ret_per_decision": -8.230884677514885,
+   "episodes": 14,
+   "sim_sec_per_episode": 44.053815381867544
+  }
+ ],
+ "validation": [
+  {
+   "ckpt": "u002000.npz",
+   "updates": 2000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 31.89750309023486,
+    "syn_single_2lane_inc@5252": 75.90506513409962,
+    "syn_arterial3@4243": 120.443544433095,
+    "syn_arterial3@5253": 50.16794252873563,
+    "hyd_gachibowli@4244": 180.26253574115876
+   },
+   "minutes": 11.0
+  },
+  {
+   "ckpt": "u006000.npz",
+   "updates": 6000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 28.398899876390605,
+    "syn_single_2lane_inc@5252": 88.64789272030652,
+    "syn_arterial3@4243": 136.43510725229825,
+    "syn_arterial3@5253": 57.98701724137931,
+    "hyd_gachibowli@4244": 212.1455981941309
+   },
+   "minutes": 17.3
+  },
+  {
+   "ckpt": "u008000.npz",
+   "updates": 8000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 31.022904820766378,
+    "syn_single_2lane_inc@5252": 84.32000000000001,
+    "syn_arterial3@4243": 131.037620020429,
+    "syn_arterial3@5253": 57.95388505747127,
+    "hyd_gachibowli@4244": 197.56832204665156
+   },
+   "minutes": 23.5
+  },
+  {
+   "ckpt": "u012000.npz",
+   "updates": 12000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.996106304079113,
+    "syn_single_2lane_inc@5252": 100.28514942528736,
+    "syn_arterial3@4243": 108.78131767109295,
+    "syn_arterial3@5253": 57.16632183908047,
+    "hyd_gachibowli@4244": 196.86828442437925
+   },
+   "minutes": 27.0
+  },
+  {
+   "ckpt": "u016000.npz",
+   "updates": 16000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.13564894932015,
+    "syn_single_2lane_inc@5252": 100.62731800766284,
+    "syn_arterial3@4243": 104.29715015321757,
+    "syn_arterial3@5253": 57.41872988505748,
+    "hyd_gachibowli@4244": 185.61197893152746
+   },
+   "minutes": 30.0
+  },
+  {
+   "ckpt": "u018000.npz",
+   "updates": 18000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.683152039555008,
+    "syn_single_2lane_inc@5252": 96.31373946360152,
+    "syn_arterial3@4243": 123.87851889683351,
+    "syn_arterial3@5253": 51.061477011494254,
+    "hyd_gachibowli@4244": 201.96735891647856
+   },
+   "minutes": 33.9
+  },
+  {
+   "ckpt": "u022000.npz",
+   "updates": 22000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 28.32134734239802,
+    "syn_single_2lane_inc@5252": 102.29469731800768,
+    "syn_arterial3@4243": 99.26646067415732,
+    "syn_arterial3@5253": 55.35594827586207,
+    "hyd_gachibowli@4244": 216.16960872836717
+   },
+   "minutes": 37.0
+  },
+  {
+   "ckpt": "u024000.npz",
+   "updates": 24000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 28.81983930778739,
+    "syn_single_2lane_inc@5252": 112.23205363984675,
+    "syn_arterial3@4243": 95.69984167517875,
+    "syn_arterial3@5253": 54.36729885057471,
+    "hyd_gachibowli@4244": 204.6133784800602
+   },
+   "minutes": 40.1
+  },
+  {
+   "ckpt": "u028000.npz",
+   "updates": 28000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.14735475896168,
+    "syn_single_2lane_inc@5252": 108.23354022988505,
+    "syn_arterial3@4243": 98.1705720122574,
+    "syn_arterial3@5253": 52.041137931034484,
+    "hyd_gachibowli@4244": 204.89683972911965
+   },
+   "minutes": 44.7
+  },
+  {
+   "ckpt": "u030000.npz",
+   "updates": 30000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 28.238912237330037,
+    "syn_single_2lane_inc@5252": 109.58045210727968,
+    "syn_arterial3@4243": 102.06255873340143,
+    "syn_arterial3@5253": 61.16474712643679,
+    "hyd_gachibowli@4244": 224.83142212189617
+   },
+   "minutes": 48.8
+  },
+  {
+   "ckpt": "u036000.npz",
+   "updates": 36000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 30.058825710754018,
+    "syn_single_2lane_inc@5252": 113.61334865900385,
+    "syn_arterial3@4243": 108.09359039836568,
+    "syn_arterial3@5253": 62.6058908045977,
+    "hyd_gachibowli@4244": 228.28741158765988
+   },
+   "minutes": 54.9
+  },
+  {
+   "ckpt": "u038000.npz",
+   "updates": 38000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.03056860321384,
+    "syn_single_2lane_inc@5252": 112.20422222222223,
+    "syn_arterial3@4243": 102.5850102145046,
+    "syn_arterial3@5253": 55.0372816091954,
+    "hyd_gachibowli@4244": 220.66492851768248
+   },
+   "minutes": 58.6
+  },
+  {
+   "ckpt": "u040000.npz",
+   "updates": 40000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 31.289332509270704,
+    "syn_single_2lane_inc@5252": 111.95016858237548,
+    "syn_arterial3@4243": 108.91870786516853,
+    "syn_arterial3@5253": 54.06220689655172,
+    "hyd_gachibowli@4244": 208.23653875094055
+   },
+   "minutes": 63.4
+  },
+  {
+   "ckpt": "u042000.npz",
+   "updates": 42000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.384845488257103,
+    "syn_single_2lane_inc@5252": 102.13563218390804,
+    "syn_arterial3@4243": 109.59883554647601,
+    "syn_arterial3@5253": 53.60348850574713,
+    "hyd_gachibowli@4244": 212.53122648607976
+   },
+   "minutes": 66.9
+  },
+  {
+   "ckpt": "u044000.npz",
+   "updates": 44000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 31.289332509270704,
+    "syn_single_2lane_inc@5252": 106.69555555555556,
+    "syn_arterial3@4243": 115.52803881511745,
+    "syn_arterial3@5253": 58.303471264367815,
+    "hyd_gachibowli@4244": 213.51549285176822
+   },
+   "minutes": 70.6
+  }
+ ]
+}
