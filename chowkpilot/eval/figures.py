@@ -129,13 +129,14 @@ def learning_curve(log, theme, selected=None):
         for name, ls in (("fixed", "-."), ("maxpressure", ":"), ("actuated", "--")):
             refs.append(ax.axhline(base[name][task], color=th["other"], linewidth=1.1, linestyle=ls, zorder=2,
                                    label=SHORT[name]))
-        if selected is not None:
-            sel = [(x, y) for (x, y), v in zip(pts, val) if v.get("ckpt") == selected]
+        if selected:
+            sel = [(x, y) for (x, y), v in zip(pts, val) if v.get("ckpt") in selected]
             if sel:
-                sx, sy = sel[0]
-                star = ax.scatter([sx], [sy], s=90, marker="*", color=th["text"], zorder=4, label="selected checkpoint")
-                ax.annotate(f"{sy:.0f} s", (sx, sy), xytext=(6, -14), textcoords="offset points",
-                            color=th["text"], fontsize=9, fontweight="bold")
+                star = ax.scatter([x for x, _ in sel], [y for _, y in sel], s=90, marker="*", color=th["text"], zorder=4,
+                                  label="selected checkpoint" if len(selected) == 1 else "ensemble members")
+                if len(sel) == 1:
+                    ax.annotate(f"{sel[0][1]:.0f} s", sel[0], xytext=(6, -14), textcoords="offset points",
+                                color=th["text"], fontsize=9, fontweight="bold")
                 refs.append(star)
         top = 1.2 * max(base["fixed"][task], *(ys[1:] or [0]))
         ax.set_ylim(0, top)
@@ -163,7 +164,8 @@ def main():
     b = json.load(open(bpath, encoding="utf-8")) if os.path.isfile(bpath) else None
     log = json.load(open(lpath, encoding="utf-8")) if os.path.isfile(lpath) else None
     spath = os.path.join(registry.ROOT, "models", "selection.json")
-    selected = json.load(open(spath, encoding="utf-8"))["selected"]["ckpt"] if os.path.isfile(spath) else None
+    sel = json.load(open(spath, encoding="utf-8"))["selected"] if os.path.isfile(spath) else None
+    selected = (sel.get("members") or [sel["ckpt"]]) if sel else None  # checkpoint names to mark on the curve
     for theme in THEMES:
         figs = {}
         if b:

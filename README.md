@@ -1,6 +1,8 @@
 # ChowkPilot 🚦 One AI signal brain for every *chowk*
 
-**NeuralStorm 2026 · Track 1 Future Tech · Problem statement FT-01: Smart Traffic Signal Optimisation**
+[![tests](https://github.com/AbderrahmaneTB/chowkpilot/actions/workflows/tests.yml/badge.svg)](https://github.com/AbderrahmaneTB/chowkpilot/actions/workflows/tests.yml)
+
+**NeuralStorm 2026 · Track 1 Future Tech · Problem statement FT-01: Smart Traffic Signal Optimisation**<br>
 **Team Blackwater:** Abderrahmane ([@AbderrahmaneTB](https://github.com/AbderrahmaneTB)) · Wael ([@WaelYTz](https://github.com/WaelYTz))
 
 **[▶ Live demo (digital twin control room)](https://abderrahmanetb.github.io/chowkpilot/)** · [How it works](#how-it-works) · [Results](#results) · [Run it yourself](#run-it-yourself)

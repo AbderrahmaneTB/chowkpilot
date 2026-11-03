@@ -34,6 +34,12 @@ def _relu(x):
 
 class NumpyPolicy:
     def __init__(self, params: dict):
+        # an ensemble is stored as m0/<name>, m1/<name>, ...; it scores a phase by the mean of its members' scores
+        groups = sorted({k.split("/", 1)[0] for k in params if "/" in k})
+        self.members = [NumpyPolicy({k.split("/", 1)[1]: v for k, v in params.items() if k.startswith(g + "/")})
+                        for g in groups]
+        if self.members:
+            return
         self.p = {k: np.asarray(v, dtype=np.float32) for k, v in params.items()}
         # architecture from the head's input width: 2H + Fp (sum pooling) or 3H + 4 (legacy mean pooling)
         self.legacy = self.p["psi1.weight"].shape[1] == 3 * HIDDEN + 4
@@ -43,8 +49,19 @@ class NumpyPolicy:
         with np.load(path) as z:
             return cls(dict(z))
 
+    @staticmethod
+    def ensemble_params(paths: list[str]) -> dict:
+        """Parameters of an ensemble of saved policies, ready for np.savez."""
+        out = {}
+        for i, path in enumerate(paths):
+            with np.load(path) as z:
+                out.update({f"m{i}/{k}": z[k] for k in z.files})
+        return out
+
     def q_values(self, mv: np.ndarray, ph: np.ndarray, mask: np.ndarray) -> np.ndarray:
         """mv [M, Fm], ph [P, Fp], mask [P, M] bool -> Q [P]."""
+        if self.members:
+            return np.mean([m.q_values(mv, ph, mask) for m in self.members], axis=0)
         p = self.p
         e = _relu(mv @ p["phi1.weight"].T + p["phi1.bias"])
         e = _relu(e @ p["phi2.weight"].T + p["phi2.bias"])          # [M, H]

@@ -162,8 +162,10 @@ def build(b, log):
                      f"({args.get('minutes', '?')} minutes of training on a laptop CPU, {args.get('workers', '?')} SUMO "
                      f"workers, {last.get('env_steps', 0):,} decisions collected, {last.get('updates', 0):,} gradient "
                      "updates)."
-                     + (f" The deployed policy is checkpoint `{sel['ckpt']}` ({sel['updates']:,} updates), the best by "
-                        f"validation delay relative to vehicle-actuated control (score {sel['score']:.3f}; "
+                     + ((f" The deployed policy is an ensemble of checkpoints {', '.join(f'`{m}`' for m in sel['members'])} "
+                         "(it averages their phase scores)" if sel.get("members") else
+                         f" The deployed policy is checkpoint `{sel['ckpt']}` ({sel['updates']:,} updates)")
+                        + f", the best by validation delay relative to vehicle-actuated control (score {sel['score']:.3f}; "
                         "[`models/selection.json`](models/selection.json))." if sel else "")
                      + " The real test junctions were never used for training, validation or model selection.")
         lines.append("")

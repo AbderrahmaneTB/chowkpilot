@@ -77,7 +77,7 @@ Full log: `models/train_log.json`. All checkpoints: `models/checkpoints/`.
 Run in the repo root. Prefix commands with `PYTHONIOENCODING=utf-8` on Windows.
 
 ```bash
-python -m chowkpilot.rl.select --revalidate 3 --workers 10    # robust pick (validation only) -> models/chowkpilot.npz
+python -m chowkpilot.rl.select --revalidate 3 --ensemble --workers 10   # robust pick (validation only) -> models/chowkpilot.npz
 python -m chowkpilot.eval.benchmark --seeds 10 --workers 10   # 3 unseen junctions -> results/benchmark.json (~30 min)
 python -m chowkpilot.eval.make_replays --workers 10           # demo replays -> docs/data/replays (~15 min)
 python -m chowkpilot.eval.export_site                         # docs/data/scenarios.json, network/, benchmark.json
@@ -108,9 +108,9 @@ Then:
 The test junctions must stay clean: choose between models with `select --revalidate` scores, never with
 `results/benchmark.json`. Ranked by expected gain per hour:
 
-1. **Checkpoint ensemble.** Average the Q-values of the 3 best re-validated checkpoints.
-   - `NumpyPolicy` holds a list of parameter sets; save it as one npz with `m0/…`, `m1/…` prefixes.
-   - Cheap (no retraining) and usually more robust. Keep it only if the re-validated score improves.
+1. **Checkpoint ensemble (implemented, not yet measured).** `select --revalidate 3 --ensemble` scores the mean-Q
+   ensemble of the 3 best checkpoints on the same validation seeds. It deploys the ensemble only if it beats the best
+   single checkpoint. `NumpyPolicy` loads ensembles saved as `m0/…`, `m1/…`, and `tests/test_core.py` covers it.
 2. **Give the policy the information actuated control uses.** Actuated wins on the isolated junction because it reacts
    to gaps in arrivals. Add per-movement features:
    - time since a vehicle last crossed the stop line (a gap measure);
@@ -139,14 +139,14 @@ The test junctions must stay clean: choose between models with `select --revalid
 
 ## P2: tests and engineering quality
 
-- GitHub Actions `.github/workflows/tests.yml`: ubuntu-latest, Python 3.12, `pip install -r requirements-train.txt`,
-  `pytest -q`. Add the badge to the README. The `eclipse-sumo` wheel works on Linux.
-- More tests:
-  - `select.score` on known numbers;
-  - replay save/load round trip;
-  - FastAPI `TestClient` on `/api/healthz` and a short `/api/simulate`;
-  - every registry scenario loads and has at least 1 signal;
-  - benchmark statistics (paired t-test and CI) against SciPy on synthetic data.
+- Done: GitHub Actions CI (`.github/workflows/tests.yml`; badge in the README). The first run passed: 1 min to
+  install, 7 s of tests on Linux.
+- Done: 9 tests covering
+  - policy NumPy/PyTorch equivalence, ensembles, deterministic demand, the junction model, safety invariants;
+  - selection scoring, 95% CIs against SciPy, the replay round trip, every scenario being signalised.
+- Still to add:
+  - FastAPI `TestClient` on `/api/healthz` and a short `/api/simulate` (add `httpx` to `requirements-train.txt`);
+  - a paired t-test check.
 - End-to-end smoke test before the release: `python -m chowkpilot.eval.benchmark --seeds 1 --skip-robustness --horizon 300`.
 - Site checks:
   - every replay listed in `docs/data/scenarios.json` loads;

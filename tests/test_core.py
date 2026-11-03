@@ -45,6 +45,28 @@ def test_numpy_policy_matches_torch():
     np.testing.assert_allclose(q_np, q_t, rtol=1e-4, atol=1e-5)
 
 
+def test_ensemble_scores_are_member_means():
+    torch = pytest.importorskip("torch")
+    from chowkpilot.rl.policy import export_numpy, torch_model
+
+    rng = np.random.default_rng(1)
+    mv = rng.random((6, MOVEMENT_FEATURES)).astype(np.float32)
+    ph = rng.random((3, PHASE_FEATURES)).astype(np.float32)
+    mask = rng.random((3, 6)) > 0.5
+    with tempfile.TemporaryDirectory() as d:
+        paths, member_q = [], []
+        for seed in (1, 2, 3):
+            torch.manual_seed(seed)
+            params = export_numpy(torch_model(MOVEMENT_FEATURES, PHASE_FEATURES))
+            paths.append(os.path.join(d, f"m{seed}.npz"))
+            np.savez(paths[-1], **params)
+            member_q.append(NumpyPolicy(params).q_values(mv, ph, mask))
+        ens = os.path.join(d, "ensemble.npz")
+        np.savez(ens, **NumpyPolicy.ensemble_params(paths))
+        q = NumpyPolicy.load(ens).q_values(mv, ph, mask)
+    np.testing.assert_allclose(q, np.mean(member_q, axis=0), rtol=1e-5, atol=1e-6)
+
+
 def test_demand_is_deterministic():
     s = registry.get(SCEN)
     with tempfile.TemporaryDirectory() as d:
