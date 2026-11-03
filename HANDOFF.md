@@ -31,8 +31,9 @@ Written 3 Nov 2026, 02:50 Algeria time, at the end of session 1. **Delete this f
   with actuated control (−2%, not significant). The exact-demand Webster plan is best at 2 of 3 areas.
 - **Still to do (people):**
   1. Full names: done in the README, licence and site footer; use the same on Devpost.
-  2. Upload `docs/img/chowkpilot_walkthrough.mp4` (2.5 min, narrated, made by `tools/make_walkthrough.py`) to
-     YouTube and add the link to the README and Devpost. `chowkpilot_demo.mp4` (48 s, no sound) is a short teaser.
+  2. Upload `docs/img/chowkpilot_walkthrough.mp4` (2 min 37 s, 1080p, narrated, made by `tools/make_walkthrough.py`)
+     to YouTube, with `docs/img/walkthrough_thumbnail.png` as the thumbnail, and add the link to the README and
+     Devpost. `chowkpilot_demo.mp4` (48 s, no sound) is a short teaser.
   3. Create the Devpost entry from the text below; submit only after both of you agree.
   4. Delete this file in the final commit.
 
