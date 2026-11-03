@@ -158,7 +158,7 @@ The test junctions must stay clean: choose between models with `select --revalid
   - selection scoring, 95% CIs against SciPy, the replay round trip, every scenario being signalised.
 - Done: `tests/test_api.py` (FastAPI `TestClient`, health check plus a short paired `/api/simulate`).
   - The simulate test needs `models/chowkpilot.npz`.
-- Still to add: a paired t-test check.
+- Done: `paired_stats` (per-seed % change, paired t-test, wins) has its own test against SciPy.
 - End-to-end smoke test before the release: `python -m chowkpilot.eval.benchmark --seeds 1 --skip-robustness --horizon 300`.
 - Site checks:
   - every replay listed in `docs/data/scenarios.json` loads;

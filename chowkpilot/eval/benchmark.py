@@ -60,6 +60,14 @@ def ci95(x):
     return float(x.mean()), float(stats.t.ppf(0.975, len(x) - 1) * x.std(ddof=1) / np.sqrt(len(x)))
 
 
+def paired_stats(ours, base) -> dict:
+    """ChowkPilot vs one baseline on the same seeds: mean per-seed % change in delay, paired t-test, wins."""
+    a, b = np.asarray(ours, dtype=float), np.asarray(base, dtype=float)
+    mean, ci = ci95((a - b) / b * 100)
+    return {"delay_change_pct": mean, "ci": ci, "p_value": float(stats.ttest_rel(a, b).pvalue),
+            "wins": int((a < b).sum()), "n": len(a)}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, default=10)
@@ -123,13 +131,8 @@ def main():
             common = sorted(set(ours) & set(base))
             if len(common) < 2:
                 continue
-            a = np.array([ours[s]["mean_delay"] for s in common])
-            b = np.array([base[s]["mean_delay"] for s in common])
-            change = (a - b) / b * 100
-            mean, ci = ci95(change)
-            p = float(stats.ttest_rel(a, b).pvalue)
-            wins = int((a < b).sum())
-            paired[sid][c] = {"delay_change_pct": mean, "ci": ci, "p_value": p, "wins": wins, "n": len(common)}
+            paired[sid][c] = paired_stats([ours[s]["mean_delay"] for s in common],
+                                          [base[s]["mean_delay"] for s in common])
 
     def avg_change(metric, base):
         vals = []

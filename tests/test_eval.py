@@ -56,3 +56,12 @@ def test_readme_claims_follow_the_sign():
     from chowkpilot.eval.readme_results import rel
     assert rel(-12.3, "fixed-time") == "**12% lower** than fixed-time"
     assert rel(4.0, "actuated") == "4% higher than actuated"  # a loss is never worded as a gain
+
+
+def test_paired_stats():
+    from chowkpilot.eval.benchmark import paired_stats
+    ours, base = [90.0, 80.0, 70.0, 95.0], [100.0, 100.0, 100.0, 100.0]
+    r = paired_stats(ours, base)
+    assert (r["wins"], r["n"]) == (4, 4)
+    assert r["delay_change_pct"] == pytest.approx(-16.25)  # mean of -10, -20, -30, -5 per cent
+    assert r["p_value"] == pytest.approx(stats.ttest_rel(ours, base).pvalue)
