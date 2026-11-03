@@ -521,7 +521,10 @@ async function init() {
   if (link.has("t")) state.t = Math.max(0, Math.min(state.tmax, Number(link.get("t")) || 0));
   if ([...$("selJunction").options].some((o) => o.value === link.get("junction"))) $("selJunction").value = link.get("junction");
   if (link.has("view") && $(link.get("view"))) $(link.get("view")).scrollIntoView();
-  fetch("api/healthz").then((r) => (r.ok ? r.json() : null)).then((h) => { if (h && h.live) $("liveBox").classList.remove("hidden"); }).catch(() => {});
+  // the live-simulation backend only exists when the page is served by app/server.py, never on GitHub Pages
+  if (!location.hostname.endsWith("github.io")) {
+    fetch("api/healthz").then((r) => (r.ok ? r.json() : null)).then((h) => { if (h && h.live) $("liveBox").classList.remove("hidden"); }).catch(() => {});
+  }
   requestAnimationFrame(tick);
   loadBenchmark();
 }

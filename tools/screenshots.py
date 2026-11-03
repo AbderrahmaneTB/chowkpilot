@@ -38,8 +38,8 @@ SHOTS = [
     ("hero", "#scenario=hyd_hitech&baseline=fixed&t=600", 1440, 1, None),
     ("mobile", "#scenario=hyd_hitech&baseline=fixed&t=600", 390, 2, None),
 ]
-READY = ("document.getElementById('loadOurs').classList.contains('hidden') && "
-         "document.getElementById('kpis').querySelectorAll('.kpi').length > 0")
+READY = ("document.getElementById('loadOurs').classList.contains('hidden') && "  # replays drawn, benchmark loaded
+         "[...document.querySelectorAll('#kpis .kpi .v')].every(e => e.textContent.trim() !== '…')")
 
 
 def find_chrome() -> str:
