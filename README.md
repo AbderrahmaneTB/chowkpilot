@@ -8,7 +8,13 @@
 **[▶ Live demo (digital twin control room)](https://abderrahmanetb.github.io/chowkpilot/)** · [How it works](#how-it-works) · [Results](#results) · [Run it yourself](#run-it-yourself)
 
 <!-- RESULTS-HERO -->
-> **Result:** on three real Hyderabad areas it never saw in training, and averaged over them, ChowkPilot's mean delay per vehicle is **59% lower** than the standard fixed-time plan (better at all 3 junctions, p < 0.05), **21% lower** than max-pressure (significantly better at 2 of 3 junctions), **2% lower** than vehicle-actuated control (no junction-level difference is significant) and **4% lower** than a Webster plan re-timed with each run’s exact demand (significantly better at 1 of 3 junctions). CO₂ is **24% lower** than with fixed-time and ambulance delay is **67% lower** than with fixed-time. ChowkPilot has the lowest mean delay of the five controllers at 1 of 3 areas. At the other 2, the lowest mean delay belongs to Fixed-time (Webster-optimised). (10 paired seeds per junction.)
+> **Results on three real Hyderabad areas never seen in training** (10 paired seeds per junction, averaged over the areas):
+> - Mean delay per vehicle **59% lower** than the standard fixed-time plan (better at all 3 junctions, p < 0.05)
+> - **21% lower** than max-pressure control (significantly better at 2 of 3 junctions)
+> - **2% lower** than vehicle-actuated control (no junction-level difference is significant)
+> - **4% lower** than a Webster plan re-timed with each run’s exact demand (significantly better at 1 of 3 junctions)
+> - CO₂ is **24% lower** than with fixed-time and ambulance delay is **67% lower** than with fixed-time
+> - Lowest mean delay of the five controllers at 1 of 3 areas. At the other 2, the lowest mean delay belongs to Fixed-time (Webster-optimised).
 <!-- /RESULTS-HERO -->
 
 ChowkPilot is a reinforcement-learning traffic-signal controller built for Indian junctions. Every few

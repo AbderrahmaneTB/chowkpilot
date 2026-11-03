@@ -90,14 +90,17 @@ def build(b, log):
     wins = sum(1 for sid in test if min(ctrls, key=lambda c: b["cells"][sid][c]["mean_delay"]["mean"]) == "chowkpilot")
     tail = (f" At the other {n - wins}, the lowest mean delay belongs to " + " and ".join(others) + "."
             if others else "")
-    hero = (f"> **Result:** on {areas} it never saw in training, and averaged over them, ChowkPilot's mean delay per "
-            f"vehicle is {rel(s['delay_vs_fixed'], 'the standard fixed-time plan')} ({sig('fixed')}), "
-            f"{rel(s['delay_vs_maxpressure'], 'max-pressure')} ({sig('maxpressure')}), "
-            f"{rel(s['delay_vs_actuated'], 'vehicle-actuated control')} ({sig('actuated')}) and "
-            f"{rel(s['delay_vs_webster'], 'a Webster plan re-timed with each run’s exact demand')} ({sig('webster')}). "
-            + (" and ".join(side) + ". " if side else "")
-            + f"ChowkPilot has the lowest mean delay of the five controllers at {wins} of {n} areas.{tail} "
-            f"({b['seeds']} paired seeds per junction.)")
+    bullets = [
+        f"Mean delay per vehicle {rel(s['delay_vs_fixed'], 'the standard fixed-time plan')} ({sig('fixed')})",
+        f"{rel(s['delay_vs_maxpressure'], 'max-pressure control')} ({sig('maxpressure')})",
+        f"{rel(s['delay_vs_actuated'], 'vehicle-actuated control')} ({sig('actuated')})",
+        f"{rel(s['delay_vs_webster'], 'a Webster plan re-timed with each run’s exact demand')} ({sig('webster')})",
+    ]
+    if side:
+        bullets.append(" and ".join(side)[0].upper() + " and ".join(side)[1:])
+    bullets.append(f"Lowest mean delay of the five controllers at {wins} of {n} areas.{tail}")
+    hero = (f"> **Results on {areas} never seen in training** ({b['seeds']} paired seeds per junction, averaged over "
+            "the areas):\n" + "\n".join(f"> - {x}" for x in bullets))
     lines = []
     lines.append(f"All numbers below are produced by `python -m chowkpilot.eval.benchmark --seeds {b['seeds']}` and stored per "
                  f"run in [`results/benchmark.json`](results/benchmark.json). Each junction is simulated for a "
