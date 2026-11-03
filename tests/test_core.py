@@ -146,3 +146,23 @@ def test_safety_layer_invariants():
             assert n == cfg.yellow, f"yellow lasted {n}s"
             nxt = runs[i + 1][0]
             assert nxt not in greens or cfg.all_red == 0, "all-red clearance skipped"
+
+
+def test_gap_features_and_older_policies():
+    """The stop-line gap and near-arrival features are in range, and an 8-feature policy still runs."""
+    s = registry.get(SCEN)
+    nm = NetworkModel(s.net_path)
+    with tempfile.TemporaryDirectory() as d:
+        routes = os.path.join(d, "r.rou.xml")
+        generate(s.net_path, routes, DemandSpec(horizon=300, seed=3, per_lane_rate=s.per_lane_rate))
+        seen = []
+        sim = Simulation(nm, routes, RandomController(), SimConfig(lateral_resolution=None, max_extra_time=0),
+                         seed=3, horizon=300, workdir=d)
+        sim.run(on_step=lambda sim: seen.append(sim.observe(0)[0]) if len(seen) < 300 else None)
+    mv = np.stack(seen)
+    assert mv.shape[-1] == MOVEMENT_FEATURES == 10
+    assert ((0 <= mv[..., 8]) & (mv[..., 8] <= 1)).all() and (mv[..., 9] >= 0).all()
+    assert (mv[..., 8] < 1).any() and (mv[..., 9] > 0).any(), "vehicles cross and arrive during the run"
+    old = os.path.join(registry.ROOT, "models", "chowkpilot.npz")
+    q = NumpyPolicy.load(old).q_values(mv[-1], np.zeros((4, PHASE_FEATURES), np.float32), nm.junctions[0].mask)
+    assert q.shape == (4,) and np.isfinite(q).all()

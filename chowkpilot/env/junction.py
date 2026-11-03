@@ -18,6 +18,7 @@ from dataclasses import dataclass
 import numpy as np
 
 GREEN_CHARS = ("G", "g")
+NEAR_RANGE = 50.0  # metres before the stop line counted as "arriving soon"
 
 
 @dataclass
@@ -137,6 +138,13 @@ class JunctionModel:
                 lanes = " ".join(l.getID() for l in chain)
                 out.append(f'    <laneAreaDetector id="{det_id}" lanes="{lanes}" pos="{excess:.2f}" '
                            f'endPos="{lane.getLength():.2f}" friendlyPos="true" freq="100000" file="NUL"/>')
+            # the same camera's view of the stop line (gap since the last crossing) and of the
+            # last NEAR_RANGE metres (vehicles about to arrive): what actuated control reacts to
+            near = max(0.0, lane.getLength() - NEAR_RANGE)
+            out.append(f'    <inductionLoop id="e1_{lane_id}" lane="{lane_id}" pos="{max(0.0, lane.getLength() - 0.5):.2f}" '
+                       f'friendlyPos="true" freq="100000" file="NUL"/>')
+            out.append(f'    <laneAreaDetector id="e2n_{lane_id}" lane="{lane_id}" pos="{near:.2f}" '
+                       f'endPos="{lane.getLength():.2f}" friendlyPos="true" freq="100000" file="NUL"/>')
             self.lanes_geo[lane_id] = (lane.getLength(), [l.getID() for l in chain])
         return out
 
