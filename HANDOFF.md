@@ -144,9 +144,9 @@ The test junctions must stay clean: choose between models with `select --revalid
 - Done: 9 tests covering
   - policy NumPy/PyTorch equivalence, ensembles, deterministic demand, the junction model, safety invariants;
   - selection scoring, 95% CIs against SciPy, the replay round trip, every scenario being signalised.
-- Still to add:
-  - FastAPI `TestClient` on `/api/healthz` and a short `/api/simulate` (add `httpx` to `requirements-train.txt`);
-  - a paired t-test check.
+- Done: `tests/test_api.py` (FastAPI `TestClient`, health check plus a short paired `/api/simulate`).
+  - The simulate test needs `models/chowkpilot.npz`.
+- Still to add: a paired t-test check.
 - End-to-end smoke test before the release: `python -m chowkpilot.eval.benchmark --seeds 1 --skip-robustness --horizon 300`.
 - Site checks:
   - every replay listed in `docs/data/scenarios.json` loads;
@@ -158,8 +158,8 @@ The test junctions must stay clean: choose between models with `select --revalid
 
 - README: badges (tests, licence, live demo), GIF at the top, screenshots, maybe an SVG version of the ASCII
   architecture diagram, and a results narrative a non-expert can follow in 30 seconds.
-- Site: `og:image` / `twitter:card` meta tags with `screen_hero.png`, so the link previews well on Devpost. Optionally a
-  "copy link to this view" button (deep links already work).
+- Site: the link-preview tags are in place and point to `docs/img/screen_hero.png`; `tools/screenshots.py` generates
+  that image, so commit it. Optionally add a "copy link to this view" button (deep links already work).
 - Video (about 75 s, `docs/img/chowkpilot_demo.mp4`): a team member uploads it to YouTube (unlisted is fine). Its link
   goes in Devpost and the README.
 - Devpost gallery: use the `screen_*.png` images and the GIF.

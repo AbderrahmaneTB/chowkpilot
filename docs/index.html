@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ChowkPilot · AI traffic signals for Indian junctions</title>
   <meta name="description" content="A learned, junction-agnostic traffic signal controller, tested zero-shot on real Hyderabad junctions with Indian mixed traffic.">
+  <meta name="theme-color" content="#050913">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://abderrahmanetb.github.io/chowkpilot/">
+  <meta property="og:title" content="ChowkPilot · AI traffic signals for Indian junctions">
+  <meta property="og:description" content="A learned, junction-agnostic traffic signal controller, tested zero-shot on real Hyderabad junctions with Indian mixed traffic.">
+  <meta property="og:image" content="https://abderrahmanetb.github.io/chowkpilot/img/screen_hero.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -248,7 +255,7 @@
         </svg>
       </div>
       <div class="card steps">
-        <div class="step"><div class="num">1</div><div><h4>Sense like a camera</h4><p>Only counts a roadside camera can provide: vehicles and stopped vehicles in the last 150 m of each lane, and how full the exit roads are.</p></div></div>
+        <div class="step"><div class="num">1</div><div><h4>Sense like a camera</h4><p>Only what a roadside camera can measure: vehicles, stopped vehicles, occupancy and waiting time in the last 150 m of each lane, how full the exit roads are, and whether an ambulance is approaching.</p></div></div>
         <div class="step"><div class="num">2</div><div><h4>Score every phase</h4><p>Max-pressure scores a phase as Σ(in − out) over the movements it releases. ChowkPilot keeps that sum structure, takes the max-pressure score as a prior and learns a correction with deep reinforcement learning (Double DQN, semi-Markov rewards on true vehicle delay).</p></div></div>
         <div class="step"><div class="num">3</div><div><h4>Stay safe and fair</h4><p>A fixed safety layer enforces minimum and maximum green, a 120 s max-red guarantee, yellow and all-red clearance, whatever the policy outputs. An ambulance approaching within 150 m gets a green corridor.</p></div></div>
         <div class="step"><div class="num">4</div><div><h4>Generalise</h4><p>Trained on 11 synthetic layouts and 2 real areas with randomised demand, time-of-day profiles and camera noise. Tested on 3 real Hyderabad areas it never saw.</p></div></div>
