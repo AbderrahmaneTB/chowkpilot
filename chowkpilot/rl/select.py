@@ -1,6 +1,6 @@
 """Select the deployed policy among training checkpoints, using validation runs only.
 
-    python -m chowkpilot.rl.select [--revalidate 3 [--ensemble]] [--workers 10] [--models models]
+    python -m chowkpilot.rl.select [--revalidate 3 [--ensemble]] [--fill N] [--workers 10] [--models models]
 
 Each validated checkpoint is scored by its mean delay relative to vehicle-actuated control
 on the validation tasks (training layouts, held-out seeds; equal weight per layout,
@@ -73,6 +73,9 @@ def main():
                     help="with --revalidate: also score the ensemble of those K checkpoints on every validation seed")
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--models", default=MODELS, help="training output folder (train_log.json, checkpoints/)")
+    ap.add_argument("--fill", type=int, default=0, metavar="N",
+                    help="first run the validation tasks for every checkpoint at a multiple of N updates "
+                         "that training did not validate (training only validates the latest checkpoint)")
     args = ap.parse_args()
     models = args.models
     ckpt = lambda name: os.path.join(models, "checkpoints", name)  # noqa: E731
@@ -84,6 +87,15 @@ def main():
         if sc is not None and v.get("ckpt"):
             rows.append({"ckpt": v["ckpt"], "updates": v["updates"], "minutes": v.get("minutes"), "score": sc,
                          "delay": v["delay"]})
+    if args.fill:
+        done = {r["ckpt"] for r in rows}
+        todo = [f for f in sorted(os.listdir(os.path.join(models, "checkpoints")))
+                if f.endswith(".npz") and f not in done and int(f[1:7]) % args.fill == 0]
+        res = run_tasks([(sid, "chowkpilot", seed, dem, ckpt(f)) for f in todo for sid, seed, dem in VALIDATION],
+                        args.workers) if todo else {}
+        for f in todo:
+            rows.append({"ckpt": f, "updates": int(f[1:7]), "minutes": None, "score": score(res[ckpt(f)], base),
+                         "delay": res[ckpt(f)], "validated_after_training": True})
     if not rows:
         raise SystemExit("no complete validation rounds found")
     if args.ensemble and not args.revalidate:
