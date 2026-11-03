@@ -35,21 +35,49 @@ def picture(name, alt):
             f'<img alt="{alt}" src="docs/img/{name}-light.png"></picture>')
 
 
+def rel(x, what):
+    """Signed comparison in words: never reports a loss as a gain."""
+    return f"**{abs(x):.0f}% lower** than {what}" if x < 0 else f"{x:.0f}% higher than {what}"
+
+
+def narrative(b):
+    """Per-junction reading of the results, including where a baseline wins."""
+    test, paired, titles, ctrls = b["test_scenarios"], b["paired"], b["titles"], b["controllers"]
+    rows, wins = [], 0
+    for sid in test:
+        cells = b["cells"][sid]
+        ours = cells["chowkpilot"]["mean_delay"]["mean"]
+        best = min((c for c in ctrls if c != "chowkpilot"), key=lambda c: cells[c]["mean_delay"]["mean"])
+        pf, pa = paired[sid]["fixed"], paired[sid]["actuated"]
+        txt = (f"- **{titles[sid]}:** {pct(pf['delay_change_pct'])} delay vs fixed-time (p={pval(pf['p_value'])}), "
+               f"{pct(pa['delay_change_pct'])} vs vehicle-actuated (p={pval(pa['p_value'])}).")
+        if ours <= cells[best]["mean_delay"]["mean"]:
+            wins += 1
+            txt += f" Lowest mean delay of the five controllers ({ours:.1f} s)."
+        else:
+            txt += f" {NAMES[best]} is best here ({cells[best]['mean_delay']['mean']:.1f} s vs ChowkPilot's {ours:.1f} s)."
+        rows.append(txt)
+    return "\n".join([f"ChowkPilot has the lowest mean delay on **{wins} of {len(test)}** unseen junctions.", ""] + rows)
+
+
 def build(b, log):
     s, test, ctrls = b["summary"], b["test_scenarios"], b["controllers"]
     titles = b["titles"]
     paired = b["paired"]
-    all_p = [paired[sid][c]["p_value"] for sid in test for c in ("fixed", "actuated") if c in paired.get(sid, {})]
-    sig = all(p < 0.01 for p in all_p)
-    hero = (f"> **Result:** on three real Hyderabad areas it never saw in training, ChowkPilot cuts the mean delay per "
-            f"vehicle by **{abs(s['delay_vs_fixed']):.0f}%** vs the standard fixed-time plan, "
-            f"**{abs(s['delay_vs_webster']):.0f}%** vs a Webster-optimised plan, "
-            f"**{abs(s['delay_vs_actuated']):.0f}%** vs vehicle-actuated control and "
-            f"**{abs(s['delay_vs_maxpressure']):.0f}%** vs max-pressure, with **{abs(s['co2_vs_fixed']):.0f}%** less CO₂ "
-            f"than fixed-time and **{abs(s['ambulance_vs_fixed']):.0f}%** less ambulance delay "
-            f"({b['seeds']} paired seeds per junction"
-            + ("; every per-junction difference vs fixed-time and vs actuated is significant at p < 0.01)." if sig else ").")
-            ) if s["delay_vs_fixed"] < 0 else "> See the results section for the full benchmark."
+    # the significance claim is only made when every per-junction difference is an improvement with p < 0.01
+    better = [paired[sid][c]["delay_change_pct"] < 0 and paired[sid][c]["p_value"] < 0.01
+              for sid in test for c in ("fixed", "actuated") if c in paired.get(sid, {})]
+    areas = {1: "one real Hyderabad area", 2: "two real Hyderabad areas", 3: "three real Hyderabad areas"}.get(
+        len(test), f"{len(test)} real Hyderabad areas")
+    side = [f"{label} is {rel(s[key], 'with fixed-time')}" for key, label in (("co2_vs_fixed", "CO₂"),
+            ("ambulance_vs_fixed", "ambulance delay")) if s.get(key) is not None and s[key] == s[key]]
+    hero = (f"> **Result:** on {areas} it never saw in training, ChowkPilot's mean delay per vehicle is "
+            f"{rel(s['delay_vs_fixed'], 'the standard fixed-time plan')}, {rel(s['delay_vs_webster'], 'a Webster-optimised plan')}, "
+            f"{rel(s['delay_vs_actuated'], 'vehicle-actuated control')} and {rel(s['delay_vs_maxpressure'], 'max-pressure')}. "
+            + (" and ".join(side) + " " if side else "")
+            + f"({b['seeds']} paired seeds per junction"
+            + ("; every per-junction difference vs fixed-time and vs actuated is an improvement significant at p < 0.01)."
+               if better and all(better) else ")."))
     lines = []
     lines.append(f"All numbers below are produced by `python -m chowkpilot.eval.benchmark --seeds {b['seeds']}` and stored per "
                  f"run in [`results/benchmark.json`](results/benchmark.json). Each junction is simulated for a "
@@ -58,6 +86,10 @@ def build(b, log):
                  f"**paired**: every controller sees exactly the same vehicles.")
     lines.append("")
     lines.append(picture("benchmark", "Mean delay per vehicle by controller on the three unseen junctions"))
+    lines.append("")
+    lines.append("### Reading the results")
+    lines.append("")
+    lines.append(narrative(b))
     lines.append("")
     lines.append("### Mean delay per vehicle (seconds, mean ± 95% CI)")
     lines.append("")

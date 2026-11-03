@@ -66,8 +66,9 @@ What this tells us:
 - The best checkpoint beats fixed-time on every validation task (14–58% less delay) and beats max-pressure on average.
 - It is roughly level with SUMO's vehicle-actuated control, our strongest baseline, and that control uses ideal loop
   detectors.
-- It wins on the arterial (seed 5253) and on the real Gachibowli network, and loses on the isolated 2-lane junction
-  (seed 5252, worse in later checkpoints).
+- Checkpoints u012000–u022000 beat actuated on the arterial (99–109 s vs 120 s on seed 4243) and on single@4242.
+  They consistently lose on the isolated 2-lane junction (96–102 s vs 74 s on seed 5252). That is a systematic weakness
+  on isolated junctions, not noise; see P1 item 2.
 - One seed per task is noisy, so use `select --revalidate`.
 
 Full log: `models/train_log.json`. All checkpoints: `models/checkpoints/`.
@@ -91,7 +92,7 @@ python tools/screenshots.py                                   # docs/img/screen_
 
 Then:
 1. Remove `docs/data/replays/` from `.gitignore`.
-   - The local replays and `docs/img/demo_hyd_hitech.gif` / `learning_curve-*.png` are **stale, from run 1**: in them
+   - The local replays and `docs/img/demo_hyd_hitech.gif` / `learning_curve-*.png` are **stale, from run 1** (before both fixes): in them
      ChowkPilot is far worse than fixed-time. Regenerate them all before committing; never publish the old ones.
 2. README:
    - Put the GIF right under the intro and fill `<!-- SCREENSHOTS -->` with `screen_twin.png`, plus `screen_mobile.png`
@@ -116,6 +117,8 @@ The test junctions must stay clean: choose between models with `select --revalid
    - time since a vehicle last crossed the stop line (a gap measure);
    - vehicles arriving within the next 50 m (`MOVEMENT_FEATURES` in `chowkpilot/env/sim.py`, `FM` in
      `chowkpilot/rl/train.py`).
+   - A finer decision interval: `SimConfig.delta` from 5 s to 2–3 s. Actuated control checks gaps every second;
+     ChowkPilot can only extend a green in 5 s steps.
    - This needs a new training run. Update the tests in `tests/test_core.py`.
 3. **Longer training on Wael's machine (NVIDIA GPU).** SUMO runs on the CPU, so the number of CPU cores sets the speed;
    the GPU frees those cores by running the learner:
@@ -156,7 +159,7 @@ The test junctions must stay clean: choose between models with `select --revalid
 
 ## P3: design polish (README 20% + demo 20%)
 
-- README: badges (tests, licence, live demo), GIF at the top, screenshots, maybe an SVG version of the ASCII
+- README: the tests badge is done (add licence and live-demo badges if wanted), GIF at the top, screenshots, maybe an SVG version of the ASCII
   architecture diagram, and a results narrative a non-expert can follow in 30 seconds.
 - Site: the link-preview tags are in place and point to `docs/img/screen_hero.png`; `tools/screenshots.py` generates
   that image, so commit it. Optionally add a "copy link to this view" button (deep links already work).

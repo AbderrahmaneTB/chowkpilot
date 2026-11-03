@@ -50,3 +50,9 @@ def test_every_scenario_is_signalised():
         assert nm.junctions, f"{s.id} has no controllable signal"
         for jm in nm.junctions:
             assert jm.mask.any(axis=1).all(), f"{s.id}: a phase releases no movement"
+
+
+def test_readme_claims_follow_the_sign():
+    from chowkpilot.eval.readme_results import rel
+    assert rel(-12.3, "fixed-time") == "**12% lower** than fixed-time"
+    assert rel(4.0, "actuated") == "4% higher than actuated"  # a loss is never worded as a gain
