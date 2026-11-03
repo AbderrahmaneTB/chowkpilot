@@ -76,6 +76,7 @@ def main():
     ap.add_argument("--fill", type=int, default=0, metavar="N",
                     help="first run the validation tasks for every checkpoint at a multiple of N updates "
                          "that training did not validate (training only validates the latest checkpoint)")
+    ap.add_argument("--fill-max", type=int, default=None, metavar="U", help="with --fill: only up to U updates")
     args = ap.parse_args()
     models = args.models
     ckpt = lambda name: os.path.join(models, "checkpoints", name)  # noqa: E731
@@ -90,7 +91,8 @@ def main():
     if args.fill:
         done = {r["ckpt"] for r in rows}
         todo = [f for f in sorted(os.listdir(os.path.join(models, "checkpoints")))
-                if f.endswith(".npz") and f not in done and int(f[1:7]) % args.fill == 0]
+                if f.endswith(".npz") and f not in done and int(f[1:7]) % args.fill == 0
+                and (args.fill_max is None or int(f[1:7]) <= args.fill_max)]
         res = run_tasks([(sid, "chowkpilot", seed, dem, ckpt(f)) for f in todo for sid, seed, dem in VALIDATION],
                         args.workers) if todo else {}
         for f in todo:
