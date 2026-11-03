@@ -1,0 +1,381 @@
+{
+ "selected": {
+  "ckpt": "ensemble.npz",
+  "members": [
+   "u005000.npz",
+   "u007000.npz",
+   "u011000.npz"
+  ],
+  "updates": null,
+  "minutes": null,
+  "score": 0.9209911822482822
+ },
+ "criterion": "mean validation delay / vehicle-actuated delay (training layouts, held-out seeds); the 3 best re-run on seeds 6262, 7272, 8282 and scored on all seeds; their ensemble (mean phase score) is scored on the same seeds",
+ "extra_actuated_delay": {
+  "syn_single_2lane_inc@6262": 118.89299575500303,
+  "syn_single_2lane_inc@7272": 77.43847556528081,
+  "syn_single_2lane_inc@8282": 49.07045654082528,
+  "syn_arterial3@6262": 98.58401934443846,
+  "syn_arterial3@7272": 86.2503607332939,
+  "syn_arterial3@8282": 66.7187109375,
+  "hyd_gachibowli@6262": 210.3521707478491,
+  "hyd_gachibowli@7272": 259.90903448275867,
+  "hyd_gachibowli@8282": 154.12184792219276
+ },
+ "candidates": [
+  {
+   "ckpt": "u006000.npz",
+   "updates": 6000,
+   "minutes": 2.5,
+   "score": 0.9619743454739789,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.743127317676148,
+    "syn_single_2lane_inc@5252": 84.94150957854406,
+    "syn_arterial3@4243": 119.48502553626149,
+    "syn_arterial3@5253": 52.94786206896551,
+    "hyd_gachibowli@4244": 206.56345372460493
+   }
+  },
+  {
+   "ckpt": "u016000.npz",
+   "updates": 16000,
+   "minutes": 4.7,
+   "score": 1.0001976101445664,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.608714462299137,
+    "syn_single_2lane_inc@5252": 108.17673563218389,
+    "syn_arterial3@4243": 130.71340653728294,
+    "syn_arterial3@5253": 53.440959770114944,
+    "hyd_gachibowli@4244": 187.58155756207674
+   }
+  },
+  {
+   "ckpt": "u025000.npz",
+   "updates": 25000,
+   "minutes": 6.6,
+   "score": 0.9962608144593418,
+   "delay": {
+    "syn_single_2lane_inc@4242": 27.932880098887512,
+    "syn_single_2lane_inc@5252": 108.78381609195402,
+    "syn_arterial3@4243": 104.99772727272726,
+    "syn_arterial3@5253": 55.17846551724138,
+    "hyd_gachibowli@4244": 209.90657637321297
+   }
+  },
+  {
+   "ckpt": "u001000.npz",
+   "updates": 1000,
+   "minutes": null,
+   "score": 1.7803116440283677,
+   "delay": {
+    "syn_single_2lane_inc@4242": 91.84788627935724,
+    "syn_single_2lane_inc@5252": 136.77701915708812,
+    "syn_arterial3@4243": 203.02018896833505,
+    "syn_arterial3@5253": 83.76670689655172,
+    "hyd_gachibowli@4244": 322.9705643340858
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u002000.npz",
+   "updates": 2000,
+   "minutes": null,
+   "score": 1.700786198248416,
+   "delay": {
+    "syn_single_2lane_inc@4242": 91.84788627935724,
+    "syn_single_2lane_inc@5252": 136.77701915708812,
+    "syn_arterial3@4243": 144.16304902962207,
+    "syn_arterial3@5253": 88.51283908045977,
+    "hyd_gachibowli@4244": 317.87359668924006
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u003000.npz",
+   "updates": 3000,
+   "minutes": null,
+   "score": 1.1581601730093165,
+   "delay": {
+    "syn_single_2lane_inc@4242": 54.59880098887515,
+    "syn_single_2lane_inc@5252": 114.39868199233716,
+    "syn_arterial3@4243": 129.31168539325841,
+    "syn_arterial3@5253": 49.17016666666667,
+    "hyd_gachibowli@4244": 201.0403987960873
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u004000.npz",
+   "updates": 4000,
+   "minutes": null,
+   "score": 1.0692444282953784,
+   "delay": {
+    "syn_single_2lane_inc@4242": 39.92983930778739,
+    "syn_single_2lane_inc@5252": 105.57667432950191,
+    "syn_arterial3@4243": 115.76510214504597,
+    "syn_arterial3@5253": 52.56179885057471,
+    "hyd_gachibowli@4244": 214.17071482317527
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u005000.npz",
+   "updates": 5000,
+   "minutes": null,
+   "score": 0.9399372605602796,
+   "delay": {
+    "syn_single_2lane_inc@4242": 30.75718170580964,
+    "syn_single_2lane_inc@5252": 69.31809195402299,
+    "syn_arterial3@4243": 120.59445352400408,
+    "syn_arterial3@5253": 49.75402873563218,
+    "hyd_gachibowli@4244": 186.9978329571106
+   },
+   "validated_after_training": true,
+   "extra_delay": {
+    "syn_single_2lane_inc@6262": 145.44434202546998,
+    "syn_single_2lane_inc@7272": 78.93177972283006,
+    "syn_single_2lane_inc@8282": 63.96129938542581,
+    "syn_arterial3@6262": 87.05087049973132,
+    "syn_arterial3@7272": 50.48285038438794,
+    "syn_arterial3@8282": 42.14858072916667,
+    "hyd_gachibowli@6262": 217.18643282594306,
+    "hyd_gachibowli@7272": 254.31011494252874,
+    "hyd_gachibowli@8282": 152.53988505747125
+   },
+   "score_first_pass": 0.8954628742645946
+  },
+  {
+   "ckpt": "u007000.npz",
+   "updates": 7000,
+   "minutes": null,
+   "score": 0.9754164904247961,
+   "delay": {
+    "syn_single_2lane_inc@4242": 31.26431396786156,
+    "syn_single_2lane_inc@5252": 82.43963218390803,
+    "syn_arterial3@4243": 108.41921348314607,
+    "syn_arterial3@5253": 49.25820689655173,
+    "hyd_gachibowli@4244": 203.47335590669678
+   },
+   "validated_after_training": true,
+   "extra_delay": {
+    "syn_single_2lane_inc@6262": 134.4541176470588,
+    "syn_single_2lane_inc@7272": 94.85221735959153,
+    "syn_single_2lane_inc@8282": 67.01476733977172,
+    "syn_arterial3@6262": 84.1598979043525,
+    "syn_arterial3@7272": 52.05711413364873,
+    "syn_arterial3@8282": 43.868854166666665,
+    "hyd_gachibowli@6262": 244.25200529450697,
+    "hyd_gachibowli@7272": 245.6383601532567,
+    "hyd_gachibowli@8282": 157.24914235190099
+   },
+   "score_first_pass": 0.9361076543760172
+  },
+  {
+   "ckpt": "u008000.npz",
+   "updates": 8000,
+   "minutes": null,
+   "score": 1.0103818434161684,
+   "delay": {
+    "syn_single_2lane_inc@4242": 30.168949320148332,
+    "syn_single_2lane_inc@5252": 92.07067432950193,
+    "syn_arterial3@4243": 120.57031664964252,
+    "syn_arterial3@5253": 51.55520114942529,
+    "hyd_gachibowli@4244": 226.35224228743417
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u009000.npz",
+   "updates": 9000,
+   "minutes": null,
+   "score": 0.9786753397847621,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.925587144622995,
+    "syn_single_2lane_inc@5252": 86.20845977011494,
+    "syn_arterial3@4243": 121.50002042900921,
+    "syn_arterial3@5253": 52.335103448275866,
+    "hyd_gachibowli@4244": 213.71433408577877
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u010000.npz",
+   "updates": 10000,
+   "minutes": null,
+   "score": 0.9980559748146431,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.950840543881334,
+    "syn_single_2lane_inc@5252": 86.78760153256705,
+    "syn_arterial3@4243": 133.19861593462718,
+    "syn_arterial3@5253": 52.61782758620689,
+    "hyd_gachibowli@4244": 214.38471030850266
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u011000.npz",
+   "updates": 11000,
+   "minutes": null,
+   "score": 0.9862163069919311,
+   "delay": {
+    "syn_single_2lane_inc@4242": 30.024215080346107,
+    "syn_single_2lane_inc@5252": 84.9307816091954,
+    "syn_arterial3@4243": 119.80770684371808,
+    "syn_arterial3@5253": 51.74917816091954,
+    "hyd_gachibowli@4244": 197.55348382242283
+   },
+   "validated_after_training": true,
+   "extra_delay": {
+    "syn_single_2lane_inc@6262": 139.95063674954517,
+    "syn_single_2lane_inc@7272": 97.72574033552151,
+    "syn_single_2lane_inc@8282": 64.76276558384548,
+    "syn_arterial3@6262": 104.71291241268135,
+    "syn_arterial3@7272": 56.497758722649316,
+    "syn_arterial3@8282": 42.17295572916667,
+    "hyd_gachibowli@6262": 227.4911912640636,
+    "hyd_gachibowli@7272": 244.6838390804598,
+    "hyd_gachibowli@8282": 145.91370468611848
+   },
+   "score_first_pass": 0.9469238439271349
+  },
+  {
+   "ckpt": "u012000.npz",
+   "updates": 12000,
+   "minutes": null,
+   "score": 0.9957728912781784,
+   "delay": {
+    "syn_single_2lane_inc@4242": 30.730222496909764,
+    "syn_single_2lane_inc@5252": 93.99177777777778,
+    "syn_arterial3@4243": 127.24159346271705,
+    "syn_arterial3@5253": 51.963189655172414,
+    "hyd_gachibowli@4244": 206.20698269375472
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u013000.npz",
+   "updates": 13000,
+   "minutes": null,
+   "score": 1.0106990881831297,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.76048207663782,
+    "syn_single_2lane_inc@5252": 99.31842911877395,
+    "syn_arterial3@4243": 134.42065372829418,
+    "syn_arterial3@5253": 52.64251149425287,
+    "hyd_gachibowli@4244": 204.0853423626787
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u014000.npz",
+   "updates": 14000,
+   "minutes": null,
+   "score": 1.0429988106635097,
+   "delay": {
+    "syn_single_2lane_inc@4242": 30.78156983930779,
+    "syn_single_2lane_inc@5252": 100.52806896551725,
+    "syn_arterial3@4243": 128.4819765066394,
+    "syn_arterial3@5253": 54.72098850574712,
+    "hyd_gachibowli@4244": 221.53457486832207
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u015000.npz",
+   "updates": 15000,
+   "minutes": null,
+   "score": 1.0575176612788313,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.879097651421507,
+    "syn_single_2lane_inc@5252": 108.40624521072796,
+    "syn_arterial3@4243": 139.60991828396325,
+    "syn_arterial3@5253": 50.54075287356322,
+    "hyd_gachibowli@4244": 218.5252972159519
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u017000.npz",
+   "updates": 17000,
+   "minutes": null,
+   "score": 1.0263595036218842,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.656872682323858,
+    "syn_single_2lane_inc@5252": 111.22249042145594,
+    "syn_arterial3@4243": 134.2082584269663,
+    "syn_arterial3@5253": 52.51018965517241,
+    "hyd_gachibowli@4244": 197.74148984198646
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u018000.npz",
+   "updates": 18000,
+   "minutes": null,
+   "score": 1.0215411631326499,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.703745364647716,
+    "syn_single_2lane_inc@5252": 103.69086590038313,
+    "syn_arterial3@4243": 126.4850204290092,
+    "syn_arterial3@5253": 49.558982758620694,
+    "hyd_gachibowli@4244": 216.01358916478554
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u019000.npz",
+   "updates": 19000,
+   "minutes": null,
+   "score": 1.0350864466104612,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.928479604449937,
+    "syn_single_2lane_inc@5252": 107.90508045977012,
+    "syn_arterial3@4243": 119.3053319713994,
+    "syn_arterial3@5253": 55.944494252873554,
+    "hyd_gachibowli@4244": 215.29406320541761
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "u020000.npz",
+   "updates": 20000,
+   "minutes": null,
+   "score": 1.0652222222708605,
+   "delay": {
+    "syn_single_2lane_inc@4242": 30.5636217552534,
+    "syn_single_2lane_inc@5252": 108.09510344827585,
+    "syn_arterial3@4243": 136.3871450459653,
+    "syn_arterial3@5253": 51.627833333333335,
+    "hyd_gachibowli@4244": 222.82227990970654
+   },
+   "validated_after_training": true
+  },
+  {
+   "ckpt": "ensemble.npz",
+   "members": [
+    "u005000.npz",
+    "u007000.npz",
+    "u011000.npz"
+   ],
+   "updates": null,
+   "minutes": null,
+   "score": 0.9209911822482822,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.25194066749073,
+    "syn_single_2lane_inc@5252": 74.58509578544061,
+    "syn_arterial3@4243": 112.96350357507661,
+    "syn_arterial3@5253": 51.09982758620689,
+    "hyd_gachibowli@4244": 204.3667494356659,
+    "syn_single_2lane_inc@6262": 118.49857489387509,
+    "syn_single_2lane_inc@7272": 92.41776805251642,
+    "syn_single_2lane_inc@8282": 59.83798068481123,
+    "syn_arterial3@6262": 77.2203062869425,
+    "syn_arterial3@7272": 55.41606741573034,
+    "syn_arterial3@8282": 43.91822265625,
+    "hyd_gachibowli@6262": 220.02623428193252,
+    "hyd_gachibowli@7272": 228.14389272030652,
+    "hyd_gachibowli@8282": 139.75692307692307
+   }
+  }
+ ]
+}

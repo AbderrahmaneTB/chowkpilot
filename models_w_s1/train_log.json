@@ -1,0 +1,185 @@
+{
+ "args": {
+  "minutes": 55.0,
+  "workers": 10,
+  "capacity": 400000,
+  "batch": 256,
+  "lr": 0.0001,
+  "gamma": 0.985,
+  "tau": 0.002,
+  "warmup": 5000,
+  "replay_ratio": 0.25,
+  "eps_start": 0.7,
+  "eps_end": 0.1,
+  "eps_decay_frac": 0.6,
+  "validate_every": 6,
+  "ckpt_every": 1000,
+  "lr_min": 3e-05,
+  "threads": 2,
+  "device": "cuda",
+  "out_weight": 0.5,
+  "balance": 0.5,
+  "out": "models_w_s1",
+  "seed": 1,
+  "baselines_only": false
+ },
+ "baseline_validation": {
+  "fixed": {
+   "syn_single_2lane_inc@4242": 48.055797280593325,
+   "syn_single_2lane_inc@5252": 88.430030651341,
+   "syn_arterial3@4243": 224.2742032686415,
+   "syn_arterial3@5253": 88.75818390804598,
+   "hyd_gachibowli@4244": 426.0763280662152
+  },
+  "actuated": {
+   "syn_single_2lane_inc@4242": 31.149419035846726,
+   "syn_single_2lane_inc@5252": 73.72475862068966,
+   "syn_arterial3@4243": 119.98103166496425,
+   "syn_arterial3@5253": 76.36573563218391,
+   "hyd_gachibowli@4244": 209.11069977426635
+  },
+  "maxpressure": {
+   "syn_single_2lane_inc@4242": 32.063275648949315,
+   "syn_single_2lane_inc@5252": 110.75649042145592,
+   "syn_arterial3@4243": 130.85192032686413,
+   "syn_arterial3@5253": 52.69755747126437,
+   "hyd_gachibowli@4244": 233.62371708051165
+  }
+ },
+ "curve": [
+  {
+   "minutes": 1.0,
+   "env_steps": 17603,
+   "updates": 3650,
+   "eps": 0.682,
+   "replay": 17603,
+   "loss": 1.8119339559339498,
+   "q": -14.113854486341141,
+   "ret_per_decision": -12.279720909903011,
+   "episodes": 50,
+   "sim_sec_per_episode": 8.381921982765197
+  },
+  {
+   "minutes": 2.0,
+   "env_steps": 47624,
+   "updates": 8350,
+   "eps": 0.664,
+   "replay": 47624,
+   "loss": 1.9580799873839034,
+   "q": -26.20789944466124,
+   "ret_per_decision": -8.761758816580734,
+   "episodes": 54,
+   "sim_sec_per_episode": 9.994307155962344
+  },
+  {
+   "minutes": 3.0,
+   "env_steps": 71294,
+   "updates": 13350,
+   "eps": 0.645,
+   "replay": 71294,
+   "loss": 2.1344139699220657,
+   "q": -31.318227877426146,
+   "ret_per_decision": -9.636063900812722,
+   "episodes": 53,
+   "sim_sec_per_episode": 9.641548862997091
+  },
+  {
+   "minutes": 4.0,
+   "env_steps": 96126,
+   "updates": 18100,
+   "eps": 0.627,
+   "replay": 96126,
+   "loss": 2.212020669610877,
+   "q": -32.31625214626914,
+   "ret_per_decision": -6.843301712287197,
+   "episodes": 49,
+   "sim_sec_per_episode": 10.920865759557607
+  },
+  {
+   "minutes": 5.0,
+   "env_steps": 121634,
+   "updates": 23100,
+   "eps": 0.609,
+   "replay": 121634,
+   "loss": 2.2741035442352295,
+   "q": -31.54013641586304,
+   "ret_per_decision": -8.89938979357288,
+   "episodes": 52,
+   "sim_sec_per_episode": 14.657409122357002
+  },
+  {
+   "minutes": 6.0,
+   "env_steps": 144802,
+   "updates": 27850,
+   "eps": 0.591,
+   "replay": 144802,
+   "loss": 2.358992805104507,
+   "q": -32.376026167217056,
+   "ret_per_decision": -11.844617731513942,
+   "episodes": 58,
+   "sim_sec_per_episode": 10.544796577815351
+  },
+  {
+   "minutes": 7.0,
+   "env_steps": 165420,
+   "updates": 32900,
+   "eps": 0.572,
+   "replay": 165420,
+   "loss": 2.487368420421487,
+   "q": -34.04100379528386,
+   "ret_per_decision": -9.832633255422868,
+   "episodes": 49,
+   "sim_sec_per_episode": 10.493101460593087
+  },
+  {
+   "minutes": 8.0,
+   "env_steps": 188870,
+   "updates": 37150,
+   "eps": 0.554,
+   "replay": 188870,
+   "loss": 2.5487312190392437,
+   "q": -34.550556829115926,
+   "ret_per_decision": -8.646925890392142,
+   "episodes": 56,
+   "sim_sec_per_episode": 9.73110384600503
+  }
+ ],
+ "validation": [
+  {
+   "ckpt": "u006000.npz",
+   "updates": 6000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.743127317676148,
+    "syn_single_2lane_inc@5252": 84.94150957854406,
+    "syn_arterial3@4243": 119.48502553626149,
+    "syn_arterial3@5253": 52.94786206896551,
+    "hyd_gachibowli@4244": 206.56345372460493
+   },
+   "minutes": 2.5
+  },
+  {
+   "ckpt": "u016000.npz",
+   "updates": 16000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 29.608714462299137,
+    "syn_single_2lane_inc@5252": 108.17673563218389,
+    "syn_arterial3@4243": 130.71340653728294,
+    "syn_arterial3@5253": 53.440959770114944,
+    "hyd_gachibowli@4244": 187.58155756207674
+   },
+   "minutes": 4.7
+  },
+  {
+   "ckpt": "u025000.npz",
+   "updates": 25000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 27.932880098887512,
+    "syn_single_2lane_inc@5252": 108.78381609195402,
+    "syn_arterial3@4243": 104.99772727272726,
+    "syn_arterial3@5253": 55.17846551724138,
+    "hyd_gachibowli@4244": 209.90657637321297
+   },
+   "minutes": 6.6
+  }
+ ]
+}

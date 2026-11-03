@@ -1,0 +1,160 @@
+{
+ "args": {
+  "minutes": 62.0,
+  "workers": 10,
+  "capacity": 400000,
+  "batch": 256,
+  "lr": 0.0001,
+  "gamma": 0.985,
+  "tau": 0.002,
+  "warmup": 5000,
+  "replay_ratio": 0.25,
+  "eps_start": 0.7,
+  "eps_end": 0.1,
+  "eps_decay_frac": 0.6,
+  "validate_every": 6,
+  "ckpt_every": 1000,
+  "lr_min": 3e-05,
+  "threads": 2,
+  "device": "cuda",
+  "out_weight": 0.5,
+  "out": "models_w",
+  "seed": 0,
+  "baselines_only": false
+ },
+ "baseline_validation": {
+  "fixed": {
+   "syn_single_2lane_inc@4242": 48.055797280593325,
+   "syn_single_2lane_inc@5252": 88.430030651341,
+   "syn_arterial3@4243": 224.2742032686415,
+   "syn_arterial3@5253": 88.75818390804598,
+   "hyd_gachibowli@4244": 426.0763280662152
+  },
+  "actuated": {
+   "syn_single_2lane_inc@4242": 31.149419035846726,
+   "syn_single_2lane_inc@5252": 73.72475862068966,
+   "syn_arterial3@4243": 119.98103166496425,
+   "syn_arterial3@5253": 76.36573563218391,
+   "hyd_gachibowli@4244": 209.11069977426635
+  },
+  "maxpressure": {
+   "syn_single_2lane_inc@4242": 32.063275648949315,
+   "syn_single_2lane_inc@5252": 110.75649042145592,
+   "syn_arterial3@4243": 130.85192032686413,
+   "syn_arterial3@5253": 52.69755747126437,
+   "hyd_gachibowli@4244": 233.62371708051165
+  }
+ },
+ "curve": [
+  {
+   "minutes": 1.0,
+   "env_steps": 27386,
+   "updates": 4150,
+   "eps": 0.684,
+   "replay": 27386,
+   "loss": 0.7773613645226123,
+   "q": -8.109129269596284,
+   "ret_per_decision": -8.76973984992321,
+   "episodes": 43,
+   "sim_sec_per_episode": 9.786525304927382
+  },
+  {
+   "minutes": 2.0,
+   "env_steps": 72775,
+   "updates": 8950,
+   "eps": 0.668,
+   "replay": 72775,
+   "loss": 1.6568046108881633,
+   "q": -22.32087066133817,
+   "ret_per_decision": -6.060911521131896,
+   "episodes": 61,
+   "sim_sec_per_episode": 10.347304801471898
+  },
+  {
+   "minutes": 3.0,
+   "env_steps": 104054,
+   "updates": 14300,
+   "eps": 0.652,
+   "replay": 104054,
+   "loss": 1.9278500136036738,
+   "q": -26.552524532068556,
+   "ret_per_decision": -7.526051552361896,
+   "episodes": 52,
+   "sim_sec_per_episode": 10.701889638717358
+  },
+  {
+   "minutes": 4.0,
+   "env_steps": 127740,
+   "updates": 18650,
+   "eps": 0.635,
+   "replay": 127740,
+   "loss": 2.1282816545442604,
+   "q": -29.574913084095922,
+   "ret_per_decision": -9.263104322425393,
+   "episodes": 45,
+   "sim_sec_per_episode": 14.16112241744995
+  },
+  {
+   "minutes": 5.0,
+   "env_steps": 165519,
+   "updates": 23650,
+   "eps": 0.619,
+   "replay": 165519,
+   "loss": 2.1366349935293196,
+   "q": -30.384430241394043,
+   "ret_per_decision": -5.338340842803273,
+   "episodes": 50,
+   "sim_sec_per_episode": 10.08801254272461
+  },
+  {
+   "minutes": 6.0,
+   "env_steps": 200782,
+   "updates": 28800,
+   "eps": 0.603,
+   "replay": 200782,
+   "loss": 2.1514187850998443,
+   "q": -30.87697125962637,
+   "ret_per_decision": -7.134142280489588,
+   "episodes": 49,
+   "sim_sec_per_episode": 10.941359339928141
+  }
+ ],
+ "validation": [
+  {
+   "ckpt": "u005000.npz",
+   "updates": 5000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 31.704425216316437,
+    "syn_single_2lane_inc@5252": 75.718030651341,
+    "syn_arterial3@4243": 127.83584780388149,
+    "syn_arterial3@5253": 53.33581609195403,
+    "hyd_gachibowli@4244": 176.7275996990218
+   },
+   "minutes": 2.1
+  },
+  {
+   "ckpt": "u014000.npz",
+   "updates": 14000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 28.692472187886278,
+    "syn_single_2lane_inc@5252": 90.2695478927203,
+    "syn_arterial3@4243": 125.47754851889682,
+    "syn_arterial3@5253": 53.80587356321839,
+    "hyd_gachibowli@4244": 188.97939051918735
+   },
+   "minutes": 4.2
+  },
+  {
+   "ckpt": "u022000.npz",
+   "updates": 22000,
+   "delay": {
+    "syn_single_2lane_inc@4242": 28.849060568603214,
+    "syn_single_2lane_inc@5252": 100.14498850574714,
+    "syn_arterial3@4243": 132.27775280898877,
+    "syn_arterial3@5253": 52.186925287356324,
+    "hyd_gachibowli@4244": 180.47529721595183
+   },
+   "minutes": 5.7
+  }
+ ]
+}

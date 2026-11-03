@@ -18,3 +18,6 @@ docs/data/replays/
 .claude/
 models/ensemble.npz
 models/*.pt
+models_w*/chowkpilot_live.npz
+models_w*/ensemble.npz
+models_w*/*.pt
