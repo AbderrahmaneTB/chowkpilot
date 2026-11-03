@@ -1,0 +1,167 @@
+[
+ {
+  "id": "hyd_secunderabad",
+  "title": "Secunderabad: S.D. Road, Patny & YMCA",
+  "split": "test",
+  "kind": "osm",
+  "attribution": "\u00a9 OpenStreetMap contributors (ODbL)",
+  "replays": [
+   "actuated",
+   "chowkpilot",
+   "fixed",
+   "maxpressure",
+   "webster"
+  ],
+  "conditions": {
+   "offpeak": {
+    "label": "Off-peak (0.6\u00d7 demand)",
+    "controllers": [
+     "chowkpilot",
+     "fixed"
+    ]
+   },
+   "heavy": {
+    "label": "Heavy (1.25\u00d7 demand)",
+    "controllers": [
+     "chowkpilot",
+     "fixed"
+    ]
+   },
+   "surge": {
+    "label": "Sudden surge",
+    "controllers": [
+     "chowkpilot",
+     "fixed"
+    ]
+   },
+   "noise": {
+    "label": "Camera noise (20% count error, 10% missed)",
+    "controllers": [
+     "chowkpilot",
+     "fixed"
+    ]
+   }
+  },
+  "junctions": 5
+ },
+ {
+  "id": "hyd_hitech",
+  "title": "Hitech City: Cyber Towers junction",
+  "split": "test",
+  "kind": "osm",
+  "attribution": "\u00a9 OpenStreetMap contributors (ODbL)",
+  "replays": [
+   "actuated",
+   "chowkpilot",
+   "fixed",
+   "maxpressure",
+   "webster"
+  ],
+  "conditions": {
+   "offpeak": {
+    "label": "Off-peak (0.6\u00d7 demand)",
+    "controllers": [
+     "chowkpilot",
+     "fixed"
+    ]
+   },
+   "heavy": {
+    "label": "Heavy (1.25\u00d7 demand)",
+    "controllers": [
+     "chowkpilot",
+     "fixed"
+    ]
+   },
+   "surge": {
+    "label": "Sudden surge",
+    "controllers": [
+     "chowkpilot",
+     "fixed"
+    ]
+   },
+   "noise": {
+    "label": "Camera noise (20% count error, 10% missed)",
+    "controllers": [
+     "chowkpilot",
+     "fixed"
+    ]
+   }
+  },
+  "junctions": 1
+ },
+ {
+  "id": "hyd_ameerpet",
+  "title": "Ameerpet / Begumpet",
+  "split": "test",
+  "kind": "osm",
+  "attribution": "\u00a9 OpenStreetMap contributors (ODbL)",
+  "replays": [
+   "actuated",
+   "chowkpilot",
+   "fixed",
+   "maxpressure",
+   "webster"
+  ],
+  "conditions": {
+   "offpeak": {
+    "label": "Off-peak (0.6\u00d7 demand)",
+    "controllers": [
+     "chowkpilot",
+     "fixed"
+    ]
+   },
+   "heavy": {
+    "label": "Heavy (1.25\u00d7 demand)",
+    "controllers": [
+     "chowkpilot",
+     "fixed"
+    ]
+   },
+   "surge": {
+    "label": "Sudden surge",
+    "controllers": [
+     "chowkpilot",
+     "fixed"
+    ]
+   },
+   "noise": {
+    "label": "Camera noise (20% count error, 10% missed)",
+    "controllers": [
+     "chowkpilot",
+     "fixed"
+    ]
+   }
+  },
+  "junctions": 5
+ },
+ {
+  "id": "syn_arterial3",
+  "title": "Synthetic arterial, 3 signals",
+  "split": "train",
+  "kind": "synthetic",
+  "attribution": "",
+  "replays": [
+   "actuated",
+   "chowkpilot",
+   "fixed",
+   "maxpressure"
+  ],
+  "conditions": {},
+  "junctions": 3
+ },
+ {
+  "id": "syn_grid3x3",
+  "title": "Synthetic 3\u00d73 grid",
+  "split": "train",
+  "kind": "synthetic",
+  "attribution": "",
+  "replays": [
+   "actuated",
+   "chowkpilot",
+   "fixed",
+   "maxpressure"
+  ],
+  "conditions": {},
+  "junctions": 9
+ }
+]

@@ -8,6 +8,8 @@
 **[▶ Live demo (digital twin control room)](https://abderrahmanetb.github.io/chowkpilot/)** · [How it works](#how-it-works) · [Results](#results) · [Run it yourself](#run-it-yourself)
 
 <!-- RESULTS-HERO -->
+> **Result:** on three real Hyderabad areas it never saw in training, and averaged over them, ChowkPilot's mean delay per vehicle is **59% lower** than the standard fixed-time plan (better at all 3 junctions, p < 0.05), **21% lower** than max-pressure (significantly better at 2 of 3 junctions), **2% lower** than vehicle-actuated control (no junction-level difference is significant) and **4% lower** than a Webster plan re-timed with each run’s exact demand (significantly better at 1 of 3 junctions). CO₂ is **24% lower** than with fixed-time and ambulance delay is **67% lower** than with fixed-time. ChowkPilot has the lowest mean delay of the five controllers at 1 of 3 areas. At the other 2, the lowest mean delay belongs to Fixed-time (Webster-optimised). (10 paired seeds per junction.)
+<!-- /RESULTS-HERO -->
 
 ChowkPilot is a reinforcement-learning traffic-signal controller built for Indian junctions. Every few
 seconds it decides which approach gets green, using only what a roadside camera can count. One small
@@ -16,6 +18,9 @@ OpenStreetMap cluster with any number of phases. It was trained on synthetic jun
 Hyderabad areas, then evaluated **zero-shot on three real Hyderabad areas it never saw**, in a
 simulator configured for Indian traffic: lane-less two-wheelers, autos, buses, left-hand driving and
 assertive merging.
+
+<p align="center"><img src="docs/img/demo_hyd_hitech.gif" width="100%" alt="Recorded SUMO run at the unseen Hitech City junction: the same peak-hour vehicles under the standard fixed-time plan (left) and ChowkPilot (right)"></p>
+<p align="center"><sub>Real SUMO output, not an animation: the same peak-hour vehicles at the unseen Hitech City junction under the standard fixed-time plan (left) and ChowkPilot (right). One recorded run (seed 3); the averages over 10 seeds are in <a href="#results">Results</a>. Stopped vehicles are tinted red.</sub></p>
 
 ---
 
@@ -143,6 +148,98 @@ The unit tests attack this layer with an adversarial random controller and check
 ## Results
 
 <!-- RESULTS -->
+All numbers below are produced by `python -m chowkpilot.eval.benchmark --seeds 10` and stored per run in [`results/benchmark.json`](results/benchmark.json). Each junction is simulated for a 30-minute peak (time-of-day profile, 4 ambulances/h) and then run until the network empties. **Delay** = SUMO time loss plus waiting-to-enter time, averaged over every vehicle. Seeds are **paired**: every controller sees exactly the same vehicles.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="docs/img/benchmark-dark.png"><img alt="Mean delay per vehicle by controller on the three unseen junctions" src="docs/img/benchmark-light.png"></picture>
+
+### Reading the results
+
+ChowkPilot has the lowest mean delay on **1 of 3** unseen junctions.
+
+- **Secunderabad: S.D. Road, Patny & YMCA:** −66.0% delay vs fixed-time (p<0.001), −8.2% vs vehicle-actuated (p=0.060). Fixed-time (Webster-optimised) is best here (218.4 s vs ChowkPilot's 225.3 s).
+- **Hitech City: Cyber Towers junction:** −58.2% delay vs fixed-time (p=0.001), −4.8% vs vehicle-actuated (p=0.587). Fixed-time (Webster-optimised) is best here (117.9 s vs ChowkPilot's 129.7 s).
+- **Ameerpet / Begumpet:** −62.4% delay vs fixed-time (p<0.001), −4.4% vs vehicle-actuated (p=0.216). Lowest mean delay of the five controllers (94.4 s).
+
+The Webster baseline is re-timed for every run from that run's exact demand, which a city cannot know in advance, so it is an upper bound for a fixed-time plan. Vehicle-actuated control uses ideal loop detectors.
+
+### Mean delay per vehicle (seconds, mean ± 95% CI)
+
+| Junction (unseen in training) | Fixed-time (standard plan) | Fixed-time (Webster-optimised) | Vehicle-actuated | Max-pressure | **ChowkPilot** |
+|---|---:|---:|---:|---:|---:|
+| Secunderabad: S.D. Road, Patny & YMCA | 641.7 ± 73.8 | **218.4 ± 63.1** | 243.1 ± 70.3 | 306.8 ± 89.6 | 225.3 ± 71.7 |
+| Hitech City: Cyber Towers junction | 240.4 ± 109.4 | **117.9 ± 88.6** | 122.1 ± 118.2 | 159.9 ± 123.3 | 129.7 ± 147.9 |
+| Ameerpet / Begumpet | 284.8 ± 89.8 | 126.5 ± 37.8 | 97.9 ± 28.0 | 113.4 ± 35.7 | **94.4 ± 30.2** |
+
+### ChowkPilot vs each baseline (paired by seed)
+
+| Junction | vs Fixed-time (standard plan) | vs Fixed-time (Webster-optimised) | vs Vehicle-actuated | vs Max-pressure |
+|---|---:|---:|---:|---:|
+| Secunderabad: S.D. Road, Patny & YMCA | −66.0% (wins 10/10, p<0.001) | +1.2% (wins 3/10, p=0.429) | −8.2% (wins 8/10, p=0.060) | −27.1% (wins 10/10, p<0.001) |
+| Hitech City: Cyber Towers junction | −58.2% (wins 9/10, p=0.001) | −10.7% (wins 8/10, p=0.673) | −4.8% (wins 7/10, p=0.587) | −29.8% (wins 9/10, p=0.134) |
+| Ameerpet / Begumpet | −62.4% (wins 10/10, p<0.001) | −25.1% (wins 10/10, p<0.001) | −4.4% (wins 6/10, p=0.216) | −16.1% (wins 10/10, p=0.002) |
+
+### Other metrics (mean over seeds)
+
+| Junction | Metric | Fixed-time (standard plan) | Fixed-time (Webster-optimised) | Vehicle-actuated | Max-pressure | **ChowkPilot** |
+|---|---|---:|---:|---:|---:|---:|
+| Secunderabad: S.D. Road, Patny & YMCA | 95th-percentile delay (s) | 1881.2 | **720.6** | 855.1 | 1089.9 | 773.4 |
+|  | Stops per vehicle | 12.94 | **4.03** | 4.49 | 7.18 | 4.51 |
+|  | CO₂ in the network (kg) | 2496.7 | **1575.4** | 1626.1 | 1753.6 | 1578.8 |
+|  | Fuel (kg) | 807.4 | **509.2** | 525.6 | 566.9 | 510.3 |
+|  | Vehicles served during the peak | 1687 | **2374** | 2327 | 2182 | 2329 |
+|  | Ambulance delay (s) | 542.2 | 132.0 | 150.6 | 160.1 | **118.8** |
+| Hitech City: Cyber Towers junction | 95th-percentile delay (s) | 1052.2 | 409.3 | 373.8 | 530.8 | **359.8** |
+|  | Stops per vehicle | 4.92 | 2.93 | **2.50** | 3.61 | 2.54 |
+|  | CO₂ in the network (kg) | 1220.0 | 998.5 | **982.1** | 1049.9 | 1039.2 |
+|  | Fuel (kg) | 394.4 | 322.7 | **317.4** | 339.4 | 335.9 |
+|  | Vehicles served during the peak | 1815 | **2035** | 2014 | 1914 | 2014 |
+|  | Ambulance delay (s) | 155.8 | 65.6 | 82.4 | 95.0 | **49.0** |
+| Ameerpet / Begumpet | 95th-percentile delay (s) | 1065.8 | 362.6 | 276.6 | 410.3 | **276.3** |
+|  | Stops per vehicle | 4.52 | 2.50 | 2.44 | 3.36 | **2.16** |
+|  | CO₂ in the network (kg) | 1258.6 | 1071.9 | 1008.5 | 1032.0 | **991.2** |
+|  | Fuel (kg) | 406.9 | 346.4 | 325.9 | 333.5 | **320.3** |
+|  | Vehicles served during the peak | 1858 | 2089 | **2140** | 2087 | 2133 |
+|  | Ambulance delay (s) | 290.3 | 252.6 | 149.9 | 233.5 | **136.7** |
+
+### What that means on the street
+
+Per simulated peak period (30 minutes of arrivals, run until the network empties), compared with the standard fixed-time plan:
+
+| Junction | Vehicles | Vehicle-hours of delay saved | vs actuated | CO₂ saved (kg) | Fuel saved (kg) |
+|---|---:|---:|---:|---:|---:|
+| Secunderabad: S.D. Road, Patny & YMCA | 3035 | 351.0 | 15.0 | 917.9 | 297.1 |
+| Hitech City: Cyber Towers junction | 2407 | 74.1 | -5.1 | 180.7 | 58.5 |
+| Ameerpet / Begumpet | 2452 | 129.7 | 2.4 | 267.4 | 86.5 |
+
+### Robustness: change in mean delay vs the standard fixed-time plan
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="docs/img/robustness-dark.png"><img alt="Delay change vs fixed-time under different conditions" src="docs/img/robustness-light.png"></picture>
+
+| Condition | Vehicle-actuated | Max-pressure | **ChowkPilot** | Fixed-time mean delay |
+|---|---:|---:|---:|---:|
+| Off-peak (0.6×) | −57.5% | −61.4% | **−64.6%** | 196 s |
+| Peak (1.0×) | −52.0% | −42.6% | **−56.0%** | 465 s |
+| Heavy (1.25×) | **−40.9%** | −27.2% | −40.8% | 635 s |
+| Sudden surge | −39.9% | −29.1% | **−42.7%** | 597 s |
+| Camera noise 20% | −52.0% | −45.0% | **−53.8%** | 465 s |
+
+Averaged over the three unseen junctions, 5 seeds each (seeds 101 onwards, disjoint from the main benchmark). *Camera noise* adds 20% multiplicative count error and drops 10% of vehicles from the camera counts that ChowkPilot and max-pressure see; fixed-time needs no detection and SUMO's actuated controller keeps ideal loop detectors, so noise favours those baselines.
+
+### Ablation: ambulance green corridor
+
+| Junction | Ambulance delay, ChowkPilot without corridor | with corridor | Mean delay of all traffic, without | with |
+|---|---:|---:|---:|---:|
+| Secunderabad: S.D. Road, Patny & YMCA | 137.5 s | 118.8 s | 229.2 s | 225.3 s |
+| Hitech City: Cyber Towers junction | 75.2 s | 49.0 s | 129.8 s | 129.7 s |
+| Ameerpet / Begumpet | 162.5 s | 136.7 s | 93.6 s | 94.4 s |
+
+### Learning curve
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="docs/img/learning_curve-dark.png"><img alt="Validation delay during training compared with baselines" src="docs/img/learning_curve-light.png"></picture>
+
+Greedy validation of each checkpoint on training layouts with held-out seeds (10.0 minutes of training, 10 SUMO workers, learner on an NVIDIA GPU, 234,643 decisions collected, 45,950 gradient updates). The deployed policy is an ensemble of checkpoints `u003000.npz`, `u005000.npz`, `u009000.npz` (it averages their phase scores), the best by validation delay relative to vehicle-actuated control (score 0.896; [`models/selection.json`](models/selection.json)). The real test junctions were never used for training, validation or model selection.
+
+<!-- /RESULTS -->
 
 ## Live demo
 
@@ -160,6 +257,13 @@ To run *new* simulations from the browser, start the local server (below) and th
 simulation form.
 
 <!-- SCREENSHOTS -->
+<img src="docs/img/screen_twin.png" width="100%" alt="Control room: the same recorded vehicles under the standard fixed-time plan (left) and ChowkPilot (right) at Hitech City, with the stopped-vehicle time series and the learned score of every phase">
+
+<table><tr>
+<td width="70%"><img src="docs/img/screen_bench.png" alt="Benchmark section: mean delay per controller on each unseen junction, with 95% confidence intervals"></td>
+<td width="30%"><img src="docs/img/screen_mobile.png" alt="The control room on a phone"></td>
+</tr></table>
+<!-- /SCREENSHOTS -->
 
 ## Run it yourself
 
