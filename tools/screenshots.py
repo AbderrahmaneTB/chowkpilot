@@ -34,6 +34,7 @@ SHOTS = [
     ("twin", "#scenario=hyd_hitech&baseline=fixed&t=600&junction=0", 1440, 1, ["#twin"]),
     ("bench", "", 1440, 1, ["#bench"]),
     ("lab", "", 1440, 1, ["#lab"]),
+    ("how", "", 1440, 1, ["#how"]),
     ("hero", "#scenario=hyd_hitech&baseline=fixed&t=600", 1440, 1, None),
     ("mobile", "#scenario=hyd_hitech&baseline=fixed&t=600", 390, 2, None),
 ]
