@@ -22,7 +22,18 @@ Written 3 Nov 2026, 02:50 Algeria time, at the end of session 1. **Delete this f
 - README and site updated for the ensemble: 10 movement inputs, 91,011 parameters, run 5b's training and selection,
   and isolated junctions as a stated limitation.
 - Site design: Barlow (signage) typography, a fixed architecture diagram, focus states. CI is green.
-- `SKIP_SELECT=1 bash tools/finalize.sh 10` started at 15:14 on the ensemble.
+- `SKIP_SELECT=1 bash tools/finalize.sh 10` ran from 15:14 to 16:12 on the ensemble: 480 runs, 0 errors.
+  - Results, replays, figures, GIF, video (48 s) and screenshots are published.
+  - The live site was checked in headless Chrome: all 52 data files load, no console errors, no sideways scroll at
+    390 px.
+  - The README headline and per-junction reading are generated from `results/benchmark.json`.
+- **Results in one line:** −59% delay vs fixed-time (significant at all 3 junctions) and −21% vs max-pressure. Level
+  with actuated control (−2%, not significant). The exact-demand Webster plan is best at 2 of 3 areas.
+- **Still to do (people):**
+  1. Full names in README line 6 and on Devpost.
+  2. Upload `docs/img/chowkpilot_demo.mp4` to YouTube and add the link to the README and Devpost.
+  3. Create the Devpost entry from the text below; submit only after both of you agree.
+  4. Delete this file in the final commit.
 
 ## Rules we must keep (from the team brief)
 
@@ -209,21 +220,91 @@ The test junctions must stay clean: choose between models with `select --revalid
   goes in Devpost and the README.
 - Devpost gallery: use the `screen_*.png` images and the GIF.
 
-## Devpost text (fill numbers from `results/benchmark.json`)
+## Devpost text (final numbers from `results/benchmark.json`, generated 3 Nov 16:09)
 
-> **ChowkPilot: one AI signal brain for every chowk.** A reinforcement-learning traffic-signal controller for Indian
-> junctions. Every few seconds it decides which approach gets green, using only what a roadside camera can count. One
-> 30k-parameter network runs any junction layout. It was trained in SUMO digital twins of synthetic junctions and two
-> real Hyderabad areas, with lane-less two-wheelers, autos and buses, then tested zero-shot on three real Hyderabad areas
-> it never saw.
->
-> **Results** (10 paired seeds per junction): X% less delay than fixed-time, Y% vs vehicle-actuated, Z% less CO₂,
-> W% less ambulance delay. Safety rules are enforced for every controller.
->
-> **Built with:** Python, Eclipse SUMO (libsumo), OpenStreetMap, PyTorch, NumPy, SciPy, FastAPI, JavaScript (Canvas),
-> GitHub Pages.
->
-> Links: repo, live demo, video. AI-tools disclosure: same wording as the README section.
+Copy each part into the matching Devpost field. Re-check the numbers if the benchmark is ever re-run.
+
+**Project name:** ChowkPilot
+
+**Elevator pitch (under 200 characters):** One reinforcement-learning signal brain for any Indian junction. It runs on
+camera counts and cut delay by 59% vs fixed-time plans on real Hyderabad junctions it never saw.
+
+**Links:**
+- Repo: https://github.com/AbderrahmaneTB/chowkpilot
+- Live demo: https://abderrahmanetb.github.io/chowkpilot/
+- Video: (YouTube link, after the upload)
+
+**About the project**
+
+## Inspiration
+Hyderabad drivers lose 123 hours a year to rush-hour congestion (TomTom Traffic Index 2026). Most signals still run
+fixed-time plans that cannot react to the traffic in front of them. The traffic itself is mixed and lane-less: 73%
+of Telangana's vehicles are two-wheelers. Controllers built for lane-disciplined car traffic and loop detectors fit
+it badly, and ambulances lose minutes at red lights.
+
+## What it does
+- Every 5 seconds ChowkPilot decides which approach of a junction gets green.
+- It uses only what a roadside camera can measure in the last 150 m of each lane.
+- One small learned policy runs any junction: 3-arm, 4-arm, 5-arm, or a joined cluster of signals.
+- A fixed safety layer enforces minimum and maximum green, a 120 s max-red guarantee and yellow plus all-red
+  clearance, whatever the policy outputs. An approaching ambulance gets a green corridor.
+- The live control room replays real SUMO runs side by side (same vehicles, baseline vs ChowkPilot). It explains
+  every phase decision with street names, and shows the full benchmark and stress tests.
+
+## How we built it
+- **Digital twins:** real Hyderabad areas from OpenStreetMap, converted with SUMO for left-hand traffic. SUMO's
+  sublane model lets two-wheelers and autos filter between cars. Indian vehicle mix and assertive merging.
+- **The policy:** a learned version of max-pressure control. A shared network embeds each movement and sums the
+  embeddings over the movements each phase releases. It receives the max-pressure score as a prior.
+- **Training:** Double DQN with semi-Markov rewards on true vehicle delay, using 10 SUMO workers and a GPU learner,
+  with randomised layouts, demand, time-of-day profiles, ambulances and camera noise.
+- **Selection, on validation only:** dense early checkpoints, re-validation on extra seeds, and an ensemble of the 3
+  best (91,011 parameters in total). A final check against our previous model ran on fresh seeds.
+- **Evaluation:** 3 unseen real Hyderabad areas, 10 paired seeds (every controller sees the same vehicles), 95% CIs,
+  paired t-tests and 5 stress conditions.
+- **Product:** the control room is a static site on GitHub Pages; an optional FastAPI backend runs new simulations.
+  CI runs 14 tests on every push.
+
+## Results (unseen junctions, averaged over the 3 areas)
+- **59% less delay** than the standard fixed-time plan, significant at all 3 junctions, winning 29 of 30 seeds.
+  That is 555 vehicle-hours and 1.4 t of CO₂ saved per simulated peak across the three areas.
+- **21% less delay** than max-pressure control.
+- **Level with vehicle-actuated control:** 2% lower on average, not significant at any junction. That baseline
+  gets ideal loop detectors; ChowkPilot sees camera counts.
+- A Webster plan re-timed with each run's exact demand, which no city has in advance, is best at 2 of the 3 areas.
+- **24% less CO₂** and **67% less ambulance delay** than fixed-time.
+- Best in 4 of 5 stress tests (off-peak, peak, sudden surge, 20% camera noise) and level with actuated in heavy
+  demand.
+
+## Challenges we ran into
+- Our first network averaged over the movements a phase releases. It learned to favour 2-lane turn bays and
+  gridlocked an arterial. Summing, as max-pressure does, fixed it.
+- A policy could starve a third phase, so we added a max-red guarantee for every controller.
+- Every training run peaked early and then drifted, so we keep dense early checkpoints and choose on validation.
+- Isolated junctions remain the weak spot. Vehicle-actuated control still wins there, which the README states.
+
+## Accomplishments that we're proud of
+- Zero-shot results on real junctions it never saw, with Indian mixed traffic.
+- An honest benchmark: paired seeds, significance tests, and the model chosen before any test run.
+- Explanations a traffic engineer can read.
+- A fully reproducible pipeline from OpenStreetMap to the website.
+
+## What we learned
+Sharing weights across movements and phases makes one policy portable across junction layouts. Most of the gain over
+fixed plans comes from reacting to live queues. Beating well-tuned actuated control needs more than that.
+
+## What's next
+- Shadow-mode trials on real camera counts at a few Hyderabad junctions.
+- Pedestrian phases.
+- Better isolated-junction control.
+- Coordination along corridors.
+
+**Built with:** python, eclipse-sumo, openstreetmap, pytorch, numpy, scipy, fastapi, javascript, html5-canvas,
+github-pages, github-actions
+
+**AI-tools disclosure:** use the README's wording. Claude Code (Anthropic) was used for research, code generation,
+debugging and documentation under the team's direction. All experiments were run, and all results produced, by the
+scripts in the repository.
 
 ## Machine notes
 
