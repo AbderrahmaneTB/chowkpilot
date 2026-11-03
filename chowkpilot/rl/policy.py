@@ -39,8 +39,10 @@ class NumpyPolicy:
         self.members = [NumpyPolicy({k.split("/", 1)[1]: v for k, v in params.items() if k.startswith(g + "/")})
                         for g in groups]
         if self.members:
+            self.delta = self.members[0].delta
             return
         self.p = {k: np.asarray(v, dtype=np.float32) for k, v in params.items()}
+        self.delta = int(self.p["__delta"][0]) if "__delta" in self.p else None  # decision interval, s (None: default)
         # architecture from the head's input width: 2H + Fp (sum pooling) or 3H + 4 (legacy mean pooling)
         self.legacy = self.p["psi1.weight"].shape[1] == 3 * HIDDEN + 4
 

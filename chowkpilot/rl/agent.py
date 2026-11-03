@@ -18,8 +18,10 @@ class LearningAgent:
     name, label, adaptive, program = "chowkpilot-train", "ChowkPilot (training)", True, None
 
     def __init__(self, policy: NumpyPolicy | None, eps: float, mp_share: float = 0.5,
-                 gamma: float = 0.985, reward_scale: float = 50.0, seed: int = 0, out_weight: float = 0.0):
+                 gamma: float = 0.985, reward_scale: float = 50.0, seed: int = 0, out_weight: float = 0.0,
+                 delta: int | None = None):
         self.policy = policy
+        self.delta = delta
         self.eps = eps
         self.mp_share = mp_share
         self.gamma = gamma

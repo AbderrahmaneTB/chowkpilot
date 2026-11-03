@@ -109,7 +109,8 @@ def sample_task(rng, ids, weights):
     return sid, demand, sim, int(rng.choice([1200, 1500, 1800]))
 
 
-def worker_main(wid, weights_path, out_q, stop_ev, eps_val, seed_base, validate_every, out_weight=0.0, balance=None):
+def worker_main(wid, weights_path, out_q, stop_ev, eps_val, seed_base, validate_every, out_weight=0.0, balance=None,
+                delta=None):
     from chowkpilot.env.sim import SimConfig, Simulation
     from chowkpilot.eval.runner import demand_for, network, run_one
     from chowkpilot.rl.agent import LearningAgent
@@ -155,7 +156,7 @@ def worker_main(wid, weights_path, out_q, stop_ev, eps_val, seed_base, validate_
         try:
             routes = os.path.join(workdir, "r.rou.xml")
             generate(scen.net_path, routes, demand_for(scen, seed, horizon, **demand))
-            agent = LearningAgent(policy, eps=eps_val.value, seed=seed, out_weight=out_weight)
+            agent = LearningAgent(policy, eps=eps_val.value, seed=seed, out_weight=out_weight, delta=delta)
             sim = Simulation(network(scen), routes, agent, SimConfig(**simo), seed=seed,
                              horizon=horizon, workdir=workdir)
             t0 = time.time()
@@ -203,6 +204,8 @@ def main():
                     help="weight of exit-road delay in the reward (neighbourhood coupling)")
     ap.add_argument("--balance", type=float, default=None,
                     help="draw training layouts with weight junctions**-BALANCE (default: 1 + 0.15 * junctions)")
+    ap.add_argument("--delta", type=int, default=None,
+                    help="ChowkPilot's decision interval in s (saved with the policy; default SimConfig.delta = 5)")
     ap.add_argument("--out", default="models")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--baselines-only", action="store_true", help="compute baseline validation scores and exit")
@@ -235,6 +238,8 @@ def main():
     def save(path, updates):
         params = export_numpy(model)
         params["__updates"] = np.array([updates])
+        if args.delta:
+            params["__delta"] = np.array([args.delta])
         tmp = path + ".tmp.npz"
         np.savez(tmp, **params)
         os.replace(tmp, path)
@@ -256,7 +261,8 @@ def main():
     eps_val = ctx.Value("d", args.eps_start)
     save(weights_path, 0)
     procs = [ctx.Process(target=worker_main, args=(i, weights_path, out_q, stop_ev, eps_val, args.seed + 17,
-                                                  args.validate_every, args.out_weight, args.balance), daemon=True)
+                                                  args.validate_every, args.out_weight, args.balance, args.delta),
+                             daemon=True)
              for i in range(args.workers)]
     for p in procs:
         p.start()

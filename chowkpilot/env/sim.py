@@ -279,9 +279,10 @@ class Simulation:
 
     def ready_junctions(self) -> list[int]:
         cfg = self.cfg
+        delta = getattr(self.controller, "delta", None) or cfg.delta  # a policy keeps the interval it was trained with
         return [j for j in range(len(self.junctions))
                 if self.mode[j] == "G" and self.timer[j] >= cfg.min_green
-                and (self.timer[j] - cfg.min_green) % cfg.delta == 0]
+                and (self.timer[j] - cfg.min_green) % delta == 0]
 
     def ev_requests(self) -> dict[int, int]:
         """Junctions that must serve an approaching ambulance -> phase to give it."""

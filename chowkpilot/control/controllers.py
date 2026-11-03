@@ -55,6 +55,7 @@ class ChowkPilot:
 
     def __init__(self, policy: NumpyPolicy | str, explain: bool = False):
         self.policy = NumpyPolicy.load(policy) if isinstance(policy, str) else policy
+        self.delta = self.policy.delta
         self.explain = explain
 
     def scores(self, sim, j):
