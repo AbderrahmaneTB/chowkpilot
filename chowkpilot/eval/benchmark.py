@@ -36,13 +36,13 @@ ROBUST_CONTROLLERS = ["actuated", "maxpressure", "chowkpilot"]
 
 def _task(t):
     from .runner import run_one
-    sid, ctrl, seed, horizon, demand, sim, tag = t
+    sid, ctrl, seed, horizon, demand, sim, tag, policy = t
     sim = dict(sim)
     if ctrl == "chowkpilot" and tag != "noev":
         sim["ev_priority"] = True
     t0 = time.time()
     try:
-        r = run_one(sid, ctrl, seed=seed, horizon=horizon, demand=demand, sim=sim)
+        r = run_one(sid, ctrl, seed=seed, horizon=horizon, demand=demand, sim=sim, policy=policy)
     except Exception as ex:  # keep the benchmark going; failures are reported
         return {"scenario": sid, "controller": ctrl, "seed": seed, "tag": tag, "error": repr(ex)}
     out = {k: r.get(k) for k in METRICS}
@@ -69,21 +69,25 @@ def main():
     ap.add_argument("--ambulances", type=float, default=4.0)
     ap.add_argument("--out", default=os.path.join(registry.ROOT, "results", "benchmark.json"))
     ap.add_argument("--skip-robustness", action="store_true")
+    ap.add_argument("--policy", default=None, help="policy .npz (default models/chowkpilot.npz)")
+    ap.add_argument("--scenarios", default=",".join(TEST))
     args = ap.parse_args()
+    test = args.scenarios.split(",")
 
     tasks = []
     base_demand = {"scale": 1.0, "profile": "peak", "ambulances_per_hour": args.ambulances}
-    for sid in TEST:
+    for sid in test:
         for seed in range(1, args.seeds + 1):
             for c in CONTROLLERS:
-                tasks.append((sid, c, seed, args.horizon, base_demand, {}, "main"))
-            tasks.append((sid, "chowkpilot", seed, args.horizon, base_demand, {}, "noev"))
+                tasks.append((sid, c, seed, args.horizon, base_demand, {}, "main", args.policy))
+            tasks.append((sid, "chowkpilot", seed, args.horizon, base_demand, {}, "noev", args.policy))
     if not args.skip_robustness:
         for label, dem, sim in ROBUSTNESS:
-            for sid in TEST:
+            for sid in test:
                 for seed in range(101, 101 + args.robust_seeds):
                     for c in ["fixed"] + ROBUST_CONTROLLERS:
-                        tasks.append((sid, c, seed, args.horizon, {"profile": "peak", **dem}, sim, "rob:" + label))
+                        tasks.append((sid, c, seed, args.horizon, {"profile": "peak", **dem}, sim, "rob:" + label,
+                                      args.policy))
     t0 = time.time()
     print(f"{len(tasks)} runs on {args.workers} workers", flush=True)
     rows = []
@@ -100,12 +104,12 @@ def main():
     titles = {s.id: s.title for s in registry.load_all()}
     cells, paired = {}, {}
     main_rows = [r for r in ok if r["tag"] == "main"]
-    for sid in TEST:
+    for sid in test:
         cells[sid] = {}
         for c in CONTROLLERS:
             rs = [r for r in main_rows if r["scenario"] == sid and r["controller"] == c]
             cells[sid][c] = {}
-            for m in METRICS + ["ambulance_delay"]:
+            for m in METRICS + ["ambulance_delay", "trips"]:
                 mean, ci = ci95([r[m] for r in rs])
                 cells[sid][c][m] = {"mean": mean, "ci": ci, "n": len(rs)}
         noev = [r for r in ok if r["tag"] == "noev" and r["scenario"] == sid]
@@ -129,7 +133,7 @@ def main():
 
     def avg_change(metric, base):
         vals = []
-        for sid in TEST:
+        for sid in test:
             o, b = cells[sid]["chowkpilot"][metric]["mean"], cells[sid][base][metric]["mean"]
             if o is not None and b and not np.isnan(o) and not np.isnan(b):
                 vals.append((o - b) / b * 100)
@@ -147,6 +151,19 @@ def main():
         "ambulance_vs_fixed": avg_change("ambulance_delay", "fixed"),
     }
 
+    # impact in concrete units, per simulated peak period at each junction area
+    impact = {}
+    for sid in test:
+        f, o = cells[sid]["fixed"], cells[sid]["chowkpilot"]
+        trips = o["trips"]["mean"]
+        impact[sid] = {
+            "vehicles": trips,
+            "vehicle_hours_saved_vs_fixed": (f["mean_delay"]["mean"] - o["mean_delay"]["mean"]) * trips / 3600,
+            "vehicle_hours_saved_vs_actuated": (cells[sid]["actuated"]["mean_delay"]["mean"] - o["mean_delay"]["mean"]) * trips / 3600,
+            "co2_kg_saved_vs_fixed": f["co2_kg"]["mean"] - o["co2_kg"]["mean"],
+            "fuel_kg_saved_vs_fixed": f["fuel_kg"]["mean"] - o["fuel_kg"]["mean"],
+        }
+
     robustness = None
     if not args.skip_robustness:
         conds = []
@@ -155,7 +172,7 @@ def main():
             vals = {}
             for c in ROBUST_CONTROLLERS:
                 changes = []
-                for sid in TEST:
+                for sid in test:
                     for seed in {r["seed"] for r in rr}:
                         o = [r for r in rr if r["scenario"] == sid and r["seed"] == seed and r["controller"] == c]
                         f = [r for r in rr if r["scenario"] == sid and r["seed"] == seed and r["controller"] == "fixed"]
@@ -165,13 +182,13 @@ def main():
             abs_delay = {c: round(float(np.mean([r["mean_delay"] for r in rr if r["controller"] == c])), 1)
                          for c in ["fixed"] + ROBUST_CONTROLLERS if any(r["controller"] == c for r in rr)}
             conds.append({"label": label, "values": vals, "mean_delay": abs_delay})
-        robustness = {"controllers": ROBUST_CONTROLLERS, "conditions": conds}
+        robustness = {"controllers": ROBUST_CONTROLLERS, "conditions": conds, "seeds": args.robust_seeds}
 
     out = {
         "generated": time.strftime("%Y-%m-%d %H:%M:%S"),
-        "seeds": args.seeds, "horizon": args.horizon, "test_scenarios": TEST, "titles": titles,
+        "seeds": args.seeds, "horizon": args.horizon, "test_scenarios": test, "titles": titles,
         "controllers": CONTROLLERS, "cells": cells, "paired": paired, "summary": summary,
-        "robustness": robustness, "errors": len(errors), "runs": len(ok),
+        "robustness": robustness, "impact": impact, "errors": len(errors), "runs": len(ok),
         "note": ("Peak-hour demand calibrated per junction (see scenarios/index.json); 4 ambulances/h. "
                  "ChowkPilot includes the ambulance green-corridor layer; the baselines have none, as deployed. "
                  "Delay = SUMO timeLoss + insertion delay, averaged over all vehicles after the network empties."),

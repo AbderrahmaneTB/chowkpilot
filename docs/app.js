@@ -4,7 +4,7 @@
 const TYPE_COLORS = ["#fbbf24", "#60a5fa", "#34d399", "#f472b6", "#a78bfa", "#ffffff"];
 const TYPE_NAMES = ["Two-wheeler", "Car", "Auto-rickshaw", "Bus", "Light truck", "Ambulance"];
 const CTRL_NAMES = {
-  fixed: "Fixed-time (deployed plan)", webster: "Fixed-time (Webster-optimised)",
+  fixed: "Fixed-time (standard plan)", webster: "Fixed-time (Webster-optimised)",
   actuated: "Vehicle-actuated", maxpressure: "Max-pressure", chowkpilot: "ChowkPilot (ours)",
 };
 // Comparison colors validated with the dataviz CVD checker on the #0f172b surface
@@ -334,7 +334,18 @@ function setData(geom, base, ours) {
   state.t = Math.min(state.t, state.tmax);
   Object.values(views).forEach((v) => (v.dirty = true));
   ["loadBase", "loadOurs"].forEach((id) => $(id).classList.add("hidden"));
+  runSummary(base, ours);
   render();
+}
+
+function runSummary(b, o) {
+  const item = (label, bv, ov, unit, dp) => {
+    const ch = pct(ov, bv), cls = ch < 0 ? "good" : "bad";
+    return `<span>${label}: <b>${bv.toFixed(dp)}${unit}</b> → <b>${ov.toFixed(dp)}${unit}</b> <span class="${cls}">(${ch > 0 ? "+" : "−"}${Math.abs(ch).toFixed(0)}%)</span></span>`;
+  };
+  $("runSummary").innerHTML = `<span>This run, whole network after it empties (${CTRL_NAMES[state.baseline] || "baseline"} → ChowkPilot):</span>` +
+    item("mean delay", b.mean_delay, o.mean_delay, " s", 0) + item("stops per vehicle", b.mean_stops, o.mean_stops, "", 2) +
+    item("CO₂", b.co2_kg, o.co2_kg, " kg", 0);
 }
 
 /* ------------------------------------------------------------------ benchmark */

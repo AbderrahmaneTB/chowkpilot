@@ -195,3 +195,29 @@ footer p { margin: 4px 0; }
 .sm .delta { margin-top: 10px; font-size: 12.5px; color: var(--muted); }
 .sm .delta b { color: var(--ours-text); }
 @media (max-width: 1080px) { .sm-grid { grid-template-columns: 1fr; } }
+
+/* problem strip */
+.problem { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 8px; }
+.ptile { border-left: 2px solid var(--line2); padding: 4px 0 4px 14px; }
+.ptile .pv { font: 800 24px/1.1 var(--mono); color: var(--text); letter-spacing: -0.02em; }
+.ptile .pk { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.ptile .psrc { display: inline-block; margin-top: 6px; font-size: 11.5px; color: var(--faint); }
+@media (max-width: 1080px) { .problem { grid-template-columns: 1fr 1fr; } }
+
+/* narrow screens: let grid children and long dropdowns shrink instead of overflowing */
+.views > *, .below > *, .grid2 > *, .lab > *, .how > *, .sm-grid > *, .kpis > *, .problem > * { min-width: 0; }
+select { max-width: 100%; text-overflow: ellipsis; }
+.controls label { min-width: 0; max-width: 100%; flex-wrap: wrap; }
+.explain-top select { min-width: 0; width: 100%; }
+@media (max-width: 760px) {
+  .controls { gap: 8px; }
+  .controls label { width: 100%; }
+  .controls label select { flex: 1; }
+  .timebox { min-width: 0; width: 100%; }
+  .sm-grid { grid-template-columns: 1fr !important; }
+}
+
+.runsum { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: baseline; font-size: 13.5px; color: var(--muted); }
+.runsum b { color: var(--text); font-family: var(--mono); }
+.runsum .good { color: var(--ours-text); font-weight: 700; font-family: var(--mono); }
+.runsum .bad { color: var(--text); font-weight: 700; font-family: var(--mono); }

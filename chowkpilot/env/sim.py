@@ -35,7 +35,7 @@ from ..sumo_paths import binary
 from .junction import JunctionModel
 
 MOVEMENT_FEATURES = 8
-PHASE_FEATURES = 4
+PHASE_FEATURES = 5
 TYPE_BY_PREFIX = {name[:2]: idx for name, idx in TYPE_INDEX.items()}
 AMBULANCE_PREFIX = "am"
 
@@ -186,11 +186,12 @@ class Simulation:
         return halt, veh, occ, ev
 
     def observe(self, j: int):
-        """Per-movement features [M, 8] and per-phase features [P, 4] for junction j."""
+        """Per-movement features [M, 8] and per-phase features [P, 5] for junction j."""
         jm = self.junctions[j]
         halt, veh, occ, ev = self.lane_counts(jm)
         wait = np.array([traci.lane.getWaitingTime(l) for l in jm.in_lanes])
         out_occ = np.array([traci.lane.getLastStepOccupancy(l) / 100.0 for l in jm.out_lanes])
+        out_veh = np.array([traci.lane.getLastStepVehicleNumber(l) for l in jm.out_lanes], dtype=float)
         M = jm.num_movements
         mv = np.zeros((M, MOVEMENT_FEATURES), dtype=np.float32)
         cur_mask = jm.mask[self.phase[j]] if self.mode[j] == "G" else jm.mask[self.next_phase[j]]
@@ -213,6 +214,10 @@ class Simulation:
             ph[self.phase[j], 0] = 1.0
             ph[self.phase[j], 1] = self.timer[j] / self.cfg.max_green
         ph[:, 2] = np.minimum(2.0, (t - self.last_served[j]) / 120.0)
+        # the max-pressure score of each phase: the classical prior the network learns to correct
+        mp = np.array([veh[jm.mv_in[m]].sum() - (out_veh[jm.mv_out[m]].mean() if jm.mv_out[m] else 0.0)
+                       for m in range(M)])
+        ph[:, 4] = (jm.mask.astype(float) @ mp) / 20.0
         return mv, ph
 
     def pressure(self, j: int) -> np.ndarray:

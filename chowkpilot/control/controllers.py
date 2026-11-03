@@ -13,7 +13,7 @@ from ..rl.policy import NumpyPolicy
 
 
 class FixedTime:
-    name, label, adaptive, program = "fixed", "Fixed-time (deployed plan)", False, "0"
+    name, label, adaptive, program = "fixed", "Fixed-time (standard plan)", False, "0"
 
 
 class Webster:

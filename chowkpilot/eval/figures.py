@@ -27,7 +27,7 @@ THEMES = {
 PANEL_TITLES = {"syn_single_2lane_inc": "4-arm junction (synthetic)", "syn_arterial3": "3-signal arterial (synthetic)",
                 "hyd_gachibowli": "Gachibowli, Hyderabad (OSM)", "hyd_secunderabad": "Secunderabad corridor (OSM)",
                 "hyd_hitech": "Hitech City, Cyber Towers (OSM)", "hyd_ameerpet": "Ameerpet / Begumpet (OSM)"}
-SHORT = {"fixed": "Fixed-time (deployed)", "webster": "Webster fixed-time", "actuated": "Vehicle-actuated",
+SHORT = {"fixed": "Fixed-time (standard plan)", "webster": "Webster fixed-time", "actuated": "Vehicle-actuated",
          "maxpressure": "Max-pressure", "chowkpilot": "ChowkPilot"}
 
 
@@ -93,50 +93,65 @@ def robustness(b, theme):
         ax.set_title(cond["label"], color=th["text"], fontsize=10, loc="left", fontweight="bold")
         if i:
             ax.tick_params(labelleft=False)
-    axes[len(conds) // 2].set_xlabel("delay change vs deployed fixed-time plan (longer bar = larger reduction)",
+    axes[len(conds) // 2].set_xlabel("delay change vs standard fixed-time plan (longer bar = larger reduction)",
                                      color=th["muted"], fontsize=9)
     fig.tight_layout()
     return fig
 
 
-def learning_curve(log, theme):
+def _by_layout(d):
+    """{'sid@seed': v} -> {'sid': mean over seeds} (older logs used plain 'sid' keys)."""
+    out = {}
+    for k, v in d.items():
+        out.setdefault(k.split("@")[0], []).append(v)
+    return {k: sum(v) / len(v) for k, v in out.items()}
+
+
+def learning_curve(log, theme, selected=None):
     th = THEMES[theme]
     val = [v for v in log["validation"] if v["delay"]]
     if not val:
         return None
-    tasks = list(val[0]["delay"])
-    base = log["baseline_validation"]
+    base = {name: _by_layout(vals) for name, vals in log["baseline_validation"].items()}
+    tasks = list(_by_layout(val[-1]["delay"]))
     fig, axes = plt.subplots(1, len(tasks), figsize=(4.6 * len(tasks), 3.0), facecolor=th["bg"])
     titles = {s.id: s.title for s in registry.load_all()}
     handles = []
     for ax, task in zip(axes, tasks):
         _style(ax, th)
         ax.grid(axis="y", color=th["grid"], linewidth=0.8)
-        xs = [v["updates"] / 1000 for v in val if task in v["delay"]]
-        ys = [v["delay"][task] for v in val if task in v["delay"]]
+        pts = [(v["updates"] / 1000, _by_layout(v["delay"]).get(task)) for v in val]
+        pts = [(x, y) for x, y in pts if y is not None]
+        xs, ys = [p[0] for p in pts], [p[1] for p in pts]
         line, = ax.plot(xs, ys, color=th["ours"], linewidth=2, marker="o", markersize=3.5, zorder=3,
-                        label="ChowkPilot (greedy, held-out seed)")
-        ax.text(xs[-1], ys[-1], f"  {ys[-1]:.0f} s", color=th["text"], fontsize=9, va="center", fontweight="bold")
+                        label="ChowkPilot checkpoints (greedy, held-out seeds)")
         refs = []
         for name, ls in (("fixed", "-."), ("maxpressure", ":"), ("actuated", "--")):
             refs.append(ax.axhline(base[name][task], color=th["other"], linewidth=1.1, linestyle=ls, zorder=2,
                                    label=SHORT[name]))
+        if selected is not None:
+            sel = [(x, y) for (x, y), v in zip(pts, val) if v.get("ckpt") == selected]
+            if sel:
+                sx, sy = sel[0]
+                star = ax.scatter([sx], [sy], s=90, marker="*", color=th["text"], zorder=4, label="selected checkpoint")
+                ax.annotate(f"{sy:.0f} s", (sx, sy), xytext=(6, -14), textcoords="offset points",
+                            color=th["text"], fontsize=9, fontweight="bold")
+                refs.append(star)
         top = 1.2 * max(base["fixed"][task], *(ys[1:] or [0]))
         ax.set_ylim(0, top)
-        if ys[0] > top:  # untrained start is off-scale: say so instead of letting it dominate the axis
+        if ys and ys[0] > top:
             ax.annotate(f"untrained: {ys[0]:.0f} s", (xs[0], top), xytext=(4, -12), textcoords="offset points",
                         color=th["muted"], fontsize=8)
-        ax.set_title(PANEL_TITLES.get(task, titles.get(task, task)), color=th["text"], fontsize=10, loc="left", fontweight="bold")
+        ax.set_title(PANEL_TITLES.get(task, titles.get(task, task)), color=th["text"], fontsize=10, loc="left",
+                     fontweight="bold")
         ax.set_xlabel("gradient updates (thousands)", color=th["muted"], fontsize=9)
         ax.set_ylabel("mean delay (s)", color=th["muted"], fontsize=9)
         handles = [line] + refs
-    leg = fig.legend(handles=handles, loc="lower center", ncol=4, frameon=False, fontsize=9,
+    leg = fig.legend(handles=handles, loc="lower center", ncol=5, frameon=False, fontsize=9,
                      bbox_to_anchor=(0.5, -0.02))
     for t in leg.get_texts():
         t.set_color(th["muted"])
     fig.tight_layout(rect=(0, 0.08, 1, 1))
-    return fig
-    fig.tight_layout()
     return fig
 
 
@@ -147,6 +162,8 @@ def main():
     lpath = os.path.join(registry.ROOT, "models", "train_log.json")
     b = json.load(open(bpath, encoding="utf-8")) if os.path.isfile(bpath) else None
     log = json.load(open(lpath, encoding="utf-8")) if os.path.isfile(lpath) else None
+    spath = os.path.join(registry.ROOT, "models", "selection.json")
+    selected = json.load(open(spath, encoding="utf-8"))["selected"]["ckpt"] if os.path.isfile(spath) else None
     for theme in THEMES:
         figs = {}
         if b:
@@ -154,7 +171,7 @@ def main():
             if b.get("robustness"):
                 figs["robustness"] = robustness(b, theme)
         if log:
-            figs["learning_curve"] = learning_curve(log, theme)
+            figs["learning_curve"] = learning_curve(log, theme, selected)
         for name, fig in figs.items():
             if fig is None:
                 continue

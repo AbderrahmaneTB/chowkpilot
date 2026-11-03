@@ -43,6 +43,17 @@
     </div>
   </section>
 
+  <section class="panel problem" aria-label="Why this matters">
+    <div class="ptile"><div class="pv">123 h</div><div class="pk">lost per driver per year in Hyderabad rush hour; Bengaluru is the world's 2nd most congested city</div>
+      <a class="psrc" href="https://www.tomtom.com/traffic-index/city/hyderabad/" target="_blank" rel="noopener">TomTom Traffic Index 2026</a></div>
+    <div class="ptile"><div class="pv">$22 bn</div><div class="pk">yearly cost of congestion in Delhi, Mumbai, Bengaluru and Kolkata</div>
+      <a class="psrc" href="https://web-assets.bcg.com/img-src/BCG-Unlocking-Cities-Ridesharing-India_tcm9-185213.pdf" target="_blank" rel="noopener">BCG, Unlocking Cities (2018)</a></div>
+    <div class="ptile"><div class="pv">73%</div><div class="pk">of Telangana's vehicles are two-wheelers: lane-less traffic that Western signal models ignore</div>
+      <a class="psrc" href="https://transport.telangana.gov.in/html/statistics_vehicles.html" target="_blank" rel="noopener">Telangana Transport Dept. (2025)</a></div>
+    <div class="ptile"><div class="pv">&gt;17 min</div><div class="pk">average ambulance response time in Delhi, rising since 2014</div>
+      <a class="psrc" href="https://www.thehindu.com/sci-tech/health/reclaiming-the-golden-hour-how-technology-can-help-beat-urban-traffic-and-save-lives/article69678684.ece" target="_blank" rel="noopener">The Hindu (2025)</a></div>
+  </section>
+
   <section id="twin" class="panel">
     <div class="section-head">
       <div>
@@ -57,7 +68,7 @@
       </label>
       <label>Compare with
         <select id="selBaseline">
-          <option value="fixed">Fixed-time (deployed plan)</option>
+          <option value="fixed">Fixed-time (standard plan)</option>
           <option value="actuated">Vehicle-actuated</option>
           <option value="maxpressure">Max-pressure</option>
           <option value="webster">Fixed-time (Webster-optimised)</option>
@@ -92,6 +103,7 @@
         <div class="loading" id="loadOurs">Loading simulation…</div>
       </div>
     </div>
+    <div class="runsum" id="runSummary" aria-live="polite"></div>
     <div class="legend" id="legend"></div>
     <div class="below">
       <div class="card">
@@ -122,7 +134,7 @@
     </div>
     <div class="sm-grid" id="benchDelay"></div>
     <div class="section-head" style="margin-top:22px"><div>
-      <h3 style="margin:0;font-size:17px">Robustness: delay reduction vs the deployed fixed-time plan</h3>
+      <h3 style="margin:0;font-size:17px">Robustness: delay reduction vs the standard fixed-time plan</h3>
       <p id="robustSub">Averaged over the three unseen junctions, 5 seeds each. Longer bar = bigger reduction.</p></div></div>
     <div class="sm-grid" id="benchRobust" style="grid-template-columns:repeat(5,1fr)"></div>
     <div class="card" style="margin-top:12px">
@@ -151,7 +163,7 @@
           <div class="sub" style="color:var(--ours-text)">Live simulator detected: run a brand-new simulation</div>
           <label>Compare with
             <select id="labBaseline">
-              <option value="fixed">Fixed-time (deployed plan)</option>
+              <option value="fixed">Fixed-time (standard plan)</option>
               <option value="actuated">Vehicle-actuated</option>
               <option value="maxpressure">Max-pressure</option>
             </select>
@@ -218,9 +230,9 @@
             <path d="M395 165 L455 165" stroke="#5c6a96" stroke-width="1.6" marker-end="url(#ar)" fill="none"/>
             <path d="M160 275 L470 205" stroke="#5c6a96" stroke-width="1.6" marker-end="url(#ar)" fill="none"/>
             <rect x="460" y="120" width="120" height="90" rx="12" fill="#131d36" stroke="#2a3962"/>
-            <text x="520" y="152" text-anchor="middle" font-weight="700">pool per phase</text>
+            <text x="520" y="152" text-anchor="middle" font-weight="700">sum per phase</text>
             <text x="520" y="172" text-anchor="middle" fill="#8d9ac4" font-size="11.5">released vs</text>
-            <text x="520" y="188" text-anchor="middle" fill="#8d9ac4" font-size="11.5">waiting</text>
+            <text x="520" y="188" text-anchor="middle" fill="#8d9ac4" font-size="11.5">waiting + MP score</text>
             <path d="M580 165 L615 165" stroke="#5c6a96" stroke-width="1.6" marker-end="url(#ar)" fill="none"/>
             <rect x="620" y="120" width="90" height="90" rx="12" fill="#0f2a1f" stroke="#22c55e"/>
             <text x="665" y="160" text-anchor="middle" font-weight="700">ψ  score</text>
@@ -228,7 +240,7 @@
             <path d="M665 210 L665 260 L420 260" stroke="#22c55e" stroke-width="1.6" marker-end="url(#ar)" fill="none"/>
             <rect x="250" y="238" width="170" height="52" rx="12" fill="#131d36" stroke="#2a3962"/>
             <text x="335" y="260" text-anchor="middle" font-weight="700">Safety layer</text>
-            <text x="335" y="278" text-anchor="middle" fill="#8d9ac4" font-size="11.5">min/max green · yellow · all-red</text>
+            <text x="335" y="278" text-anchor="middle" fill="#8d9ac4" font-size="11.5">min/max green · max red · clearance</text>
             <text x="250" y="42" fill="#8d9ac4" font-size="12">Same weights for every junction: 3-arm, 4-arm, 5-arm,</text>
             <text x="250" y="60" fill="#8d9ac4" font-size="12">joined OSM clusters, any number of phases.</text>
             <text x="250" y="86" fill="#5c6a96" font-size="11.5">38k parameters · pure NumPy at inference</text>
@@ -237,8 +249,8 @@
       </div>
       <div class="card steps">
         <div class="step"><div class="num">1</div><div><h4>Sense like a camera</h4><p>Only counts a roadside camera can provide: vehicles and stopped vehicles in the last 150 m of each lane, and how full the exit roads are.</p></div></div>
-        <div class="step"><div class="num">2</div><div><h4>Score every phase</h4><p>Max-pressure scores a phase as Σ(in − out) over the movements it releases. ChowkPilot learns that scoring with deep reinforcement learning (Double DQN, semi-Markov rewards on true vehicle delay).</p></div></div>
-        <div class="step"><div class="num">3</div><div><h4>Stay safe and fair</h4><p>A fixed safety layer enforces minimum and maximum green, yellow and all-red clearance. An ambulance approaching within 150 m gets a green corridor.</p></div></div>
+        <div class="step"><div class="num">2</div><div><h4>Score every phase</h4><p>Max-pressure scores a phase as Σ(in − out) over the movements it releases. ChowkPilot keeps that sum structure, takes the max-pressure score as a prior and learns a correction with deep reinforcement learning (Double DQN, semi-Markov rewards on true vehicle delay).</p></div></div>
+        <div class="step"><div class="num">3</div><div><h4>Stay safe and fair</h4><p>A fixed safety layer enforces minimum and maximum green, a 120 s max-red guarantee, yellow and all-red clearance, whatever the policy outputs. An ambulance approaching within 150 m gets a green corridor.</p></div></div>
         <div class="step"><div class="num">4</div><div><h4>Generalise</h4><p>Trained on 11 synthetic layouts and 2 real areas with randomised demand, time-of-day profiles and camera noise. Tested on 3 real Hyderabad areas it never saw.</p></div></div>
       </div>
     </div>

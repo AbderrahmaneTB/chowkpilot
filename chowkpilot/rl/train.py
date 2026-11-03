@@ -28,12 +28,18 @@ import traceback
 import numpy as np
 
 M_MAX, P_MAX = 32, 8
-FM, FP = 8, 4
-VALIDATION = [  # (scenario, seed, demand overrides) on training networks only
+FM, FP = 8, 5
+VALIDATION = [  # (scenario, seed, demand overrides) on training networks only, seeds never used for testing
     ("syn_single_2lane_inc", 4242, {"scale": 1.0, "profile": "peak"}),
+    ("syn_single_2lane_inc", 5252, {"scale": 1.0, "profile": "peak"}),
     ("syn_arterial3", 4243, {"scale": 1.0, "profile": "peak"}),
+    ("syn_arterial3", 5253, {"scale": 1.0, "profile": "peak"}),
     ("hyd_gachibowli", 4244, {"scale": 1.0, "profile": "peak"}),
 ]
+
+
+def task_key(sid, seed):
+    return f"{sid}@{seed}"
 
 
 def pack(transitions):
@@ -125,16 +131,20 @@ def worker_main(wid, weights_path, out_q, stop_ev, eps_val, seed_base, validate_
                 policy = NumpyPolicy.load(weights_path)
         except Exception:
             pass
-        if wid == 0 and policy is not None and validate_every and episodes % validate_every == 0:
-            updates = int(policy.p.get("__updates", np.zeros(1))[0])
-            res = {}
-            for sid, seed, dem in VALIDATION:
-                try:
-                    r = run_one(sid, "chowkpilot", seed=seed, horizon=1200, demand=dem, policy=weights_path)
-                    res[sid] = r["mean_delay"]
-                except Exception:
-                    traceback.print_exc()
-            out_q.put(("val", wid, {"updates": updates, "delay": res}))
+        if wid == 0 and validate_every and episodes % validate_every == 0:
+            ckdir = os.path.join(os.path.dirname(weights_path), "checkpoints")
+            ckpts = sorted(f for f in os.listdir(ckdir) if f.endswith(".npz")) if os.path.isdir(ckdir) else []
+            if ckpts and ckpts[-1] != getattr(worker_main, "_last_ckpt", None):
+                worker_main._last_ckpt = ckpts[-1]
+                path = os.path.join(ckdir, ckpts[-1])
+                res = {}
+                for sid, seed, dem in VALIDATION:
+                    try:
+                        r = run_one(sid, "chowkpilot", seed=seed, horizon=1200, demand=dem, policy=path)
+                        res[task_key(sid, seed)] = r["mean_delay"]
+                    except Exception:
+                        traceback.print_exc()
+                out_q.put(("val", wid, {"ckpt": ckpts[-1], "updates": int(ckpts[-1][1:7]), "delay": res}))
         sid, demand, simo, horizon = sample_task(rng, ids, w)
         scen = by_id[sid]
         seed = int(rng.integers(1, 2_000_000))
@@ -162,7 +172,7 @@ def baseline_validation():
     from chowkpilot.eval.runner import run_one
     out = {}
     for c in ("fixed", "actuated", "maxpressure"):
-        out[c] = {sid: run_one(sid, c, seed=seed, horizon=1200, demand=dem)["mean_delay"]
+        out[c] = {task_key(sid, seed): run_one(sid, c, seed=seed, horizon=1200, demand=dem)["mean_delay"]
                   for sid, seed, dem in VALIDATION}
     return out
 
@@ -171,7 +181,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--minutes", type=float, default=150)
     ap.add_argument("--workers", type=int, default=5)
-    ap.add_argument("--capacity", type=int, default=250_000)
+    ap.add_argument("--capacity", type=int, default=400_000)
     ap.add_argument("--batch", type=int, default=256)
     ap.add_argument("--lr", type=float, default=3e-4)
     ap.add_argument("--gamma", type=float, default=0.985)
@@ -179,9 +189,11 @@ def main():
     ap.add_argument("--warmup", type=int, default=5000)
     ap.add_argument("--replay-ratio", type=float, default=0.25, help="gradient updates per new transition")
     ap.add_argument("--eps-start", type=float, default=0.7)
-    ap.add_argument("--eps-end", type=float, default=0.05)
-    ap.add_argument("--eps-decay-frac", type=float, default=0.45)
-    ap.add_argument("--validate-every", type=int, default=12)
+    ap.add_argument("--eps-end", type=float, default=0.1)
+    ap.add_argument("--eps-decay-frac", type=float, default=0.6)
+    ap.add_argument("--validate-every", type=int, default=6)
+    ap.add_argument("--ckpt-every", type=int, default=2000, help="save a numbered checkpoint every N updates")
+    ap.add_argument("--lr-min", type=float, default=3e-5, help="cosine-decayed learning rate at the end")
     ap.add_argument("--threads", type=int, default=2)
     ap.add_argument("--out-weight", type=float, default=0.0,
                     help="weight of exit-road delay in the reward (neighbourhood coupling)")
@@ -191,8 +203,11 @@ def main():
     args = ap.parse_args()
     if args.baselines_only:
         os.makedirs(args.out, exist_ok=True)
-        with open(os.path.join(args.out, "baseline_validation.json"), "w") as f:
-            json.dump(baseline_validation(), f, indent=1)
+        scores = baseline_validation()
+        path = os.path.join(args.out, "baseline_validation.json")
+        with open(path + ".tmp", "w") as f:
+            json.dump(scores, f, indent=1)
+        os.replace(path + ".tmp", path)
         return
 
     import torch
@@ -219,10 +234,14 @@ def main():
 
     cache = os.path.join(args.out, "baseline_validation.json")
     base_val = None  # computed separately (python -m chowkpilot.rl.train --baselines-only) so training starts at once
-    if os.path.exists(cache):
-        with open(cache) as f:
-            base_val = json.load(f)
-        print(json.dumps(base_val), flush=True)
+    def read_cache():
+        try:
+            with open(cache) as f:
+                return json.load(f)
+        except (OSError, ValueError):  # missing, or still being written by --baselines-only
+            return None
+
+    base_val = read_cache()
 
     ctx = mp.get_context("spawn")
     out_q = ctx.Queue(maxsize=64)
@@ -265,6 +284,9 @@ def main():
             # epsilon decays with wall-clock progress (throughput varies with CPU load)
             frac = (time.time() - t_start) / (deadline - t_start)
             eps_val.value = args.eps_end + (args.eps_start - args.eps_end) * max(0.0, 1 - frac / args.eps_decay_frac)
+            lr = args.lr_min + 0.5 * (args.lr - args.lr_min) * (1 + np.cos(np.pi * min(1.0, frac)))
+            for g in opt.param_groups:
+                g["lr"] = lr
             if replay.size < args.warmup or budget < 1:
                 time.sleep(0.05 if got else 0.25)
             while replay.size >= args.warmup and budget >= 1 and time.time() < deadline:
@@ -288,6 +310,9 @@ def main():
                         p_t.mul_(1 - args.tau).add_(p, alpha=args.tau)
                 updates += 1
                 budget -= 1
+                if updates % args.ckpt_every == 0:
+                    os.makedirs(os.path.join(args.out, "checkpoints"), exist_ok=True)
+                    save(os.path.join(args.out, "checkpoints", f"u{updates:06d}.npz"), updates)
                 losses.append(float(loss))
                 qs.append(float(q_sa.mean()))
                 if updates % 50 == 0:
@@ -313,9 +338,7 @@ def main():
         save(weights_path, updates)
         save(final_path, updates)
         torch.save(model.state_dict(), os.path.join(args.out, "chowkpilot.pt"))
-        if os.path.exists(cache):
-            with open(cache) as f:
-                log["baseline_validation"] = json.load(f)
+        log["baseline_validation"] = read_cache() or log["baseline_validation"]
         with open(os.path.join(args.out, "train_log.json"), "w") as f:
             json.dump(log, f, indent=1)
         for p in procs:
