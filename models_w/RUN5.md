@@ -35,10 +35,13 @@ Runs 5a, 5b and 5c were stopped by hand once validation had clearly degraded (th
 | 5a | default | 0 | u005000 at 2.1 min: 0.917 (76), u014000 at 4.2 min: 0.951 (90), u022000 at 5.7 min: 0.966 (100) |
 | 5b | --balance 0.5 | 0 | u003000 at 1.7 min: 0.892 (82), u011000 at 3.3 min: 0.914 (81), u019000 at 4.7 min: 0.995 (99), u026000 at 6.4 min: 1.011 (109), u035000 at 8.4 min: 1.024 (98) |
 | 5c | --balance 0.5 | 1 | u006000 at 2.5 min: 0.962 (85), u016000 at 4.7 min: 1.000 (108), u025000 at 6.6 min: 0.996 (109) |
+| 5d | --balance 0.5, --delta 3 | 0 | u003000 at 1.9 min: 1.162 (97), u012000 at 3.8 min: 0.932 (84) |
 
-Logs: run 5a `models_w/run5a_train_log.json`, run 5b `models_w/train_log.json`, run 5c `models_w_s1/train_log.json`.
-Each log ends at its last 60-second write before the stop. Run 5b's checkpoints are committed; run 5c's
-(a replicate) stay on the GPU laptop.
+Run 5d also decides every 3 s instead of 5 s (`train.py --delta 3`, stored in the policy file).
+
+Logs: run 5a `models_w/run5a_train_log.json`, run 5b `models_w/train_log.json`, run 5c `models_w_s1/train_log.json`,
+run 5d `models_w_d3/train_log.json`. Each log ends at its last 60-second write before the stop. Run 5b's
+checkpoints are committed; those of 5c and 5d stay on the GPU laptop.
 
 ## Selection (`select --fill 1000 --fill-max 20000 --revalidate 3 --ensemble`)
 
@@ -60,8 +63,12 @@ Each log ends at its last 60-second write before the stop. Run 5b's checkpoints 
 | 5c | u007000 | 0.975 | 0.936 | 0.996 | 1.169 | 0.733 | 1.025 |
 | 5c | u011000 | 0.986 | 0.947 | 1.009 | 1.175 | 0.805 | 0.979 |
 | 5c | **ensemble (u005000 + u007000 + u011000)** (selected) | 0.921 |  | 0.925 | 1.072 | 0.739 | 0.952 |
+| 5d (`models_w_d3`) | u008000 | 0.960 | 0.911 | 0.987 | 1.228 | 0.716 | 0.937 |
+| 5d | u009000 | 0.968 | 0.913 | 0.998 | 1.191 | 0.753 | 0.962 |
+| 5d | **u013000** (selected) | 0.909 | 0.905 | 0.910 | 1.108 | 0.724 | 0.895 |
+| 5d | ensemble (u013000 + u008000 + u009000) | 0.929 |  | 0.932 | 1.068 | 0.776 | 0.944 |
 
-Generated from the three `selection.json` files.
+Generated from the four `selection.json` files.
 
 ## Reading
 
@@ -71,7 +78,10 @@ Generated from the three `selection.json` files.
   - The isolated junction is unchanged (1.078 vs 1.066), still behind actuated.
 - **The gain is not reliable.** Run 5c uses the same recipe with another seed and lands level with run 4
   (0.921 / 0.925). Run 5b's margin is within seed-to-seed variance.
-- **The isolated-junction weakness is not fixed.** Neither the gap features nor the layout balancing removed it.
+- **The 3 s decision interval (5d) lands in the same place as 5b**: 0.910 on the extra seeds, with the isolated
+  junction at 1.108.
+- **The isolated-junction weakness is not fixed.** Neither the gap features, the layout balancing nor the finer
+  decision interval removed it.
   Hitech City, one of the three test areas, is a single junction, so expect ChowkPilot to be level with or behind
   actuated there.
 - **The drift is driven by updates, not by exploration.** It started while ε was still about 0.6. A lower learning
@@ -88,8 +98,9 @@ Generated from the three `selection.json` files.
      into `models/`;
   3. re-running all of P0 (benchmark about 1–1.5 h);
   4. updating the parameter count in the README: 3 × 30,337 = 91,011 for the ensemble (30,337 for one network).
-- **Untried:** a finer decision interval for ChowkPilot (`SimConfig.delta` 5 s → 2–3 s). Actuated control checks
-  gaps every second, while ChowkPilot can extend a green only in 5 s steps.
+
+Run 5d's u013000 scores about the same (0.910) and is a single network. It is not a better choice: it was picked
+among more candidates, and it is worse on the isolated junction.
 
 ## Environment
 

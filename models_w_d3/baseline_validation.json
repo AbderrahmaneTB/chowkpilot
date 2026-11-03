@@ -1,0 +1,23 @@
+{
+ "fixed": {
+  "syn_single_2lane_inc@4242": 48.055797280593325,
+  "syn_single_2lane_inc@5252": 88.430030651341,
+  "syn_arterial3@4243": 224.2742032686415,
+  "syn_arterial3@5253": 88.75818390804598,
+  "hyd_gachibowli@4244": 426.0763280662152
+ },
+ "actuated": {
+  "syn_single_2lane_inc@4242": 31.149419035846726,
+  "syn_single_2lane_inc@5252": 73.72475862068966,
+  "syn_arterial3@4243": 119.98103166496425,
+  "syn_arterial3@5253": 76.36573563218391,
+  "hyd_gachibowli@4244": 209.11069977426635
+ },
+ "maxpressure": {
+  "syn_single_2lane_inc@4242": 32.063275648949315,
+  "syn_single_2lane_inc@5252": 110.75649042145592,
+  "syn_arterial3@4243": 130.85192032686413,
+  "syn_arterial3@5253": 52.69755747126437,
+  "hyd_gachibowli@4244": 233.62371708051165
+ }
+}
