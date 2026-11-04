@@ -5,7 +5,7 @@
 **NeuralStorm 2026 · Track 1 Future Tech · Problem statement FT-01: Smart Traffic Signal Optimisation**<br>
 **Team Blackwater:** Abderrahmane Tayeb Boudjema ([@AbderrahmaneTB](https://github.com/AbderrahmaneTB)) · Ouail Imad Eddine Zitouni ([@WaelYTz](https://github.com/WaelYTz))
 
-**[▶ Live demo (digital twin control room)](https://abderrahmanetb.github.io/chowkpilot/)** · **[🎬 2.5-minute narrated walkthrough](https://abderrahmanetb.github.io/chowkpilot/img/chowkpilot_walkthrough.mp4)** · [How it works](#how-it-works) · [Results](#results) · [Run it yourself](#run-it-yourself)
+**[▶ Live demo (digital twin control room)](https://abderrahmanetb.github.io/chowkpilot/)** · **[🎬 2.5-minute narrated walkthrough](https://www.youtube.com/watch?v=ymLgzVjIqkI)** · [How it works](#how-it-works) · [Results](#results) · [Run it yourself](#run-it-yourself)
 
 <!-- RESULTS-HERO -->
 > **Results on three real Hyderabad areas never seen in training** (10 paired seeds per junction, averaged over the areas):
