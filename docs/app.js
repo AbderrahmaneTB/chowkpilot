@@ -388,7 +388,8 @@ async function loadBenchmark() {
     k(s.co2_vs_fixed, "CO₂ from traffic in the network", "HBEFA4 emission model, vs fixed-time") +
     k(s.ambulance_vs_fixed, "ambulance delay with green corridor", "vs fixed-time, same ambulances");
   $("benchIntro").textContent = `Mean delay per vehicle, ${b.seeds} paired seeds per junction, ${b.horizon / 60}-minute peak with the network fully drained. ` +
-    "Whiskers are 95% confidence intervals. These real Hyderabad areas were never used for training or model selection.";
+    "Whiskers are 95% confidence intervals. These real Hyderabad areas were never used for training or model selection. " +
+    "Webster is a fixed plan re-timed with each run's exact demand, which a real city cannot know in advance.";
   $("benchDelay").innerHTML = b.test_scenarios.map((sid) => {
     const cells = b.cells[sid];
     const rows = b.controllers.map((c) => ({ name: SHORT[c], value: cells[c].mean_delay.mean, ci: cells[c].mean_delay.ci, ours: c === "chowkpilot",

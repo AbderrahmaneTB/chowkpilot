@@ -27,7 +27,7 @@ THEMES = {
 PANEL_TITLES = {"syn_single_2lane_inc": "4-arm junction (synthetic)", "syn_arterial3": "3-signal arterial (synthetic)",
                 "hyd_gachibowli": "Gachibowli, Hyderabad (OSM)", "hyd_secunderabad": "Secunderabad corridor (OSM)",
                 "hyd_hitech": "Hitech City, Cyber Towers (OSM)", "hyd_ameerpet": "Ameerpet / Begumpet (OSM)"}
-SHORT = {"fixed": "Fixed-time (standard plan)", "webster": "Webster fixed-time", "actuated": "Vehicle-actuated",
+SHORT = {"fixed": "Fixed-time (standard plan)", "webster": "Webster (exact demand)", "actuated": "Vehicle-actuated",
          "maxpressure": "Max-pressure", "chowkpilot": "ChowkPilot"}
 
 
