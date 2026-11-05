@@ -14,7 +14,7 @@
 > - **2% lower** than vehicle-actuated control (no junction-level difference is significant)
 > - **4% lower** than a Webster plan re-timed with each run’s exact demand (significantly better at 1 of 3 junctions)
 > - CO₂ is **24% lower** than with fixed-time and ambulance delay is **67% lower** than with fixed-time
-> - Lowest mean delay of the five controllers at 1 of 3 areas. At the other 2, the lowest mean delay belongs to Fixed-time (Webster-optimised).
+> - Lowest mean delay of the five controllers at 1 of 3 areas. At the other 2, the lowest is a Webster plan re-timed with each run's exact demand, which a real city cannot know in advance; ChowkPilot's gap to it is not statistically significant (p=0.429, p=0.673).
 <!-- /RESULTS-HERO -->
 
 ChowkPilot is a reinforcement-learning traffic-signal controller built for Indian junctions. Every few
@@ -160,17 +160,17 @@ All numbers below are produced by `python -m chowkpilot.eval.benchmark --seeds 1
 
 ### Reading the results
 
-ChowkPilot has the lowest mean delay on **1 of 3** unseen junctions.
+Against the fixed-time plans most junctions run today, ChowkPilot cuts delay by 58–66% at every unseen junction (p < 0.01). Against vehicle-actuated control, which gets ideal loop detectors, no junction-level difference is significant. It has the lowest mean delay of the five controllers at **1 of 3** unseen junctions.
 
-- **Secunderabad: S.D. Road, Patny & YMCA:** −66.0% delay vs fixed-time (p<0.001), −8.2% vs vehicle-actuated (p=0.060). Fixed-time (Webster-optimised) is best here (218.4 s vs ChowkPilot's 225.3 s).
-- **Hitech City: Cyber Towers junction:** −58.2% delay vs fixed-time (p=0.001), −4.8% vs vehicle-actuated (p=0.587). Fixed-time (Webster-optimised) is best here (117.9 s vs ChowkPilot's 129.7 s).
+- **Secunderabad: S.D. Road, Patny & YMCA:** −66.0% delay vs fixed-time (p<0.001), −8.2% vs vehicle-actuated (p=0.060). Webster (exact demand) is best here (218.4 s vs ChowkPilot's 225.3 s; difference not significant, p=0.429).
+- **Hitech City: Cyber Towers junction:** −58.2% delay vs fixed-time (p=0.001), −4.8% vs vehicle-actuated (p=0.587). Webster (exact demand) is best here (117.9 s vs ChowkPilot's 129.7 s; difference not significant, p=0.673).
 - **Ameerpet / Begumpet:** −62.4% delay vs fixed-time (p<0.001), −4.4% vs vehicle-actuated (p=0.216). Lowest mean delay of the five controllers (94.4 s).
 
 The Webster baseline is re-timed for every run from that run's exact demand, which a city cannot know in advance, so it is an upper bound for a fixed-time plan. Vehicle-actuated control uses ideal loop detectors.
 
 ### Mean delay per vehicle (seconds, mean ± 95% CI)
 
-| Junction (unseen in training) | Fixed-time (standard plan) | Fixed-time (Webster-optimised) | Vehicle-actuated | Max-pressure | **ChowkPilot** |
+| Junction (unseen in training) | Fixed-time (standard plan) | Webster (exact demand) | Vehicle-actuated | Max-pressure | **ChowkPilot** |
 |---|---:|---:|---:|---:|---:|
 | Secunderabad: S.D. Road, Patny & YMCA | 641.7 ± 73.8 | **218.4 ± 63.1** | 243.1 ± 70.3 | 306.8 ± 89.6 | 225.3 ± 71.7 |
 | Hitech City: Cyber Towers junction | 240.4 ± 109.4 | **117.9 ± 88.6** | 122.1 ± 118.2 | 159.9 ± 123.3 | 129.7 ± 147.9 |
@@ -178,7 +178,7 @@ The Webster baseline is re-timed for every run from that run's exact demand, whi
 
 ### ChowkPilot vs each baseline (paired by seed)
 
-| Junction | vs Fixed-time (standard plan) | vs Fixed-time (Webster-optimised) | vs Vehicle-actuated | vs Max-pressure |
+| Junction | vs Fixed-time (standard plan) | vs Webster (exact demand) | vs Vehicle-actuated | vs Max-pressure |
 |---|---:|---:|---:|---:|
 | Secunderabad: S.D. Road, Patny & YMCA | −66.0% (wins 10/10, p<0.001) | +1.2% (wins 3/10, p=0.429) | −8.2% (wins 8/10, p=0.060) | −27.1% (wins 10/10, p<0.001) |
 | Hitech City: Cyber Towers junction | −58.2% (wins 9/10, p=0.001) | −10.7% (wins 8/10, p=0.673) | −4.8% (wins 7/10, p=0.587) | −29.8% (wins 9/10, p=0.134) |
@@ -186,7 +186,7 @@ The Webster baseline is re-timed for every run from that run's exact demand, whi
 
 ### Other metrics (mean over seeds)
 
-| Junction | Metric | Fixed-time (standard plan) | Fixed-time (Webster-optimised) | Vehicle-actuated | Max-pressure | **ChowkPilot** |
+| Junction | Metric | Fixed-time (standard plan) | Webster (exact demand) | Vehicle-actuated | Max-pressure | **ChowkPilot** |
 |---|---|---:|---:|---:|---:|---:|
 | Secunderabad: S.D. Road, Patny & YMCA | 95th-percentile delay (s) | 1881.2 | **720.6** | 855.1 | 1089.9 | 773.4 |
 |  | Stops per vehicle | 12.94 | **4.03** | 4.49 | 7.18 | 4.51 |

@@ -4,7 +4,7 @@
 const TYPE_COLORS = ["#fbbf24", "#60a5fa", "#34d399", "#f472b6", "#a78bfa", "#ffffff"];
 const TYPE_NAMES = ["Two-wheeler", "Car", "Auto-rickshaw", "Bus", "Light truck", "Ambulance"];
 const CTRL_NAMES = {
-  fixed: "Fixed-time (standard plan)", webster: "Fixed-time (Webster-optimised)",
+  fixed: "Fixed-time (standard plan)", webster: "Webster (exact demand)",
   actuated: "Vehicle-actuated", maxpressure: "Max-pressure", chowkpilot: "ChowkPilot (ours)",
 };
 // Comparison colors validated with the dataviz CVD checker on the #0f172b surface

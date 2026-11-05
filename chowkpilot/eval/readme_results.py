@@ -14,8 +14,9 @@ import re
 
 from ..scenarios import registry
 
-NAMES = {"fixed": "Fixed-time (standard plan)", "webster": "Fixed-time (Webster-optimised)",
+NAMES = {"fixed": "Fixed-time (standard plan)", "webster": "Webster (exact demand)",
          "actuated": "Vehicle-actuated", "maxpressure": "Max-pressure", "chowkpilot": "**ChowkPilot**"}
+WEBSTER_NOTE = "a Webster plan re-timed with each run's exact demand, which a real city cannot know in advance"
 
 
 def pct(x):
@@ -40,6 +41,19 @@ def rel(x, what):
     return f"**{abs(x):.0f}% lower** than {what}" if x < 0 else f"{x:.0f}% higher than {what}"
 
 
+def p_bound(ps):
+    """The tightest of p < 0.001 / 0.01 / 0.05 that holds for every p-value, or None."""
+    return next((f"p < {t}" for t in (0.001, 0.01, 0.05) if max(ps) < t), None)
+
+
+def gap_to_best(b, sid, best):
+    """How ChowkPilot's gap to the junction's best baseline reads, from the paired test."""
+    pr = b["paired"][sid].get(best)
+    if pr is None:
+        return ""
+    return "difference not significant" if pr["p_value"] >= 0.05 else "significant"
+
+
 def narrative(b):
     """Per-junction reading of the results, including where a baseline wins."""
     test, paired, titles, ctrls = b["test_scenarios"], b["paired"], b["titles"], b["controllers"]
@@ -55,12 +69,25 @@ def narrative(b):
             wins += 1
             txt += f" Lowest mean delay of the five controllers ({ours:.1f} s)."
         else:
-            txt += f" {NAMES[best]} is best here ({cells[best]['mean_delay']['mean']:.1f} s vs ChowkPilot's {ours:.1f} s)."
+            pb = paired[sid].get(best)
+            gap = f"; {gap_to_best(b, sid, best)}, {pfmt(pb['p_value'])}" if pb else ""
+            txt += (f" {NAMES[best]} is best here ({cells[best]['mean_delay']['mean']:.1f} s vs ChowkPilot's "
+                    f"{ours:.1f} s{gap}).")
         rows.append(txt)
+    fixed = [paired[sid]["fixed"] for sid in test]
+    lead = ""
+    if all(pr["delay_change_pct"] < 0 for pr in fixed) and p_bound([pr["p_value"] for pr in fixed]):
+        cuts = [abs(pr["delay_change_pct"]) for pr in fixed]
+        span = f"{min(cuts):.0f}–{max(cuts):.0f}%" if round(min(cuts)) != round(max(cuts)) else f"{min(cuts):.0f}%"
+        lead = (f"Against the fixed-time plans most junctions run today, ChowkPilot cuts delay by {span} at "
+                f"every unseen junction ({p_bound([pr['p_value'] for pr in fixed])}). ")
+    acts = [paired[sid]["actuated"] for sid in test]
+    if all(pr["p_value"] >= 0.05 for pr in acts):
+        lead += "Against vehicle-actuated control, which gets ideal loop detectors, no junction-level difference is significant. "
+    lead += f"It has the lowest mean delay of the five controllers at **{wins} of {len(test)}** unseen junctions."
     note = ("The Webster baseline is re-timed for every run from that run's exact demand, which a city cannot know in "
             "advance, so it is an upper bound for a fixed-time plan. Vehicle-actuated control uses ideal loop detectors.")
-    return "\n".join([f"ChowkPilot has the lowest mean delay on **{wins} of {len(test)}** unseen junctions.", ""] + rows
-                     + ["", note])
+    return "\n".join([lead, ""] + rows + ["", note])
 
 
 def build(b, log):
@@ -85,11 +112,19 @@ def build(b, log):
 
     side = [f"{label} {rel(s[key], 'with fixed-time')}" for key, label in (("co2_vs_fixed", "CO₂ is"),
             ("ambulance_vs_fixed", "ambulance delay is")) if s.get(key) is not None and s[key] == s[key]]
-    others = sorted({NAMES[best] for best in (min(ctrls, key=lambda c: b["cells"][sid][c]["mean_delay"]["mean"])
-                                               for sid in test) if best != "chowkpilot"})
-    wins = sum(1 for sid in test if min(ctrls, key=lambda c: b["cells"][sid][c]["mean_delay"]["mean"]) == "chowkpilot")
-    tail = (f" At the other {n - wins}, the lowest mean delay belongs to " + " and ".join(others) + "."
-            if others else "")
+    best_of = {sid: min(ctrls, key=lambda c: b["cells"][sid][c]["mean_delay"]["mean"]) for sid in test}
+    lost = [sid for sid in test if best_of[sid] != "chowkpilot"]
+    wins = n - len(lost)
+    tail = ""
+    if lost:
+        names = sorted({best_of[sid] for sid in lost})
+        who = WEBSTER_NOTE if names == ["webster"] else " and ".join(NAMES[c] for c in names)
+        tail = f" At the other {len(lost)}, the lowest is {who}"
+        ps = [paired[sid][best_of[sid]]["p_value"] for sid in lost if best_of[sid] in paired[sid]]
+        if len(ps) == len(lost) and all(p >= 0.05 for p in ps):
+            tail += ("; ChowkPilot's gap to it is not statistically significant ("
+                     + ", ".join(pfmt(p) for p in ps) + ")")
+        tail += "."
     bullets = [
         f"Mean delay per vehicle {rel(s['delay_vs_fixed'], 'the standard fixed-time plan')} ({sig('fixed')})",
         f"{rel(s['delay_vs_maxpressure'], 'max-pressure control')} ({sig('maxpressure')})",
